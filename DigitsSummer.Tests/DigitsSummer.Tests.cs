@@ -6,7 +6,7 @@ namespace DigitsSummer.Tests
 {
     public class DigitsSummerTests
     {
-        
+
         public const string DataFile1M = @"../../../../Data/data1M.txt";
         public const string DataFile10M = "../../../../Data/data10M.txt";
         public const string DataFile100M = "../../../../Data/data100M.txt";
@@ -79,8 +79,5 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(45, DigitsSummer.SumV4("123456789"));
             Assert.AreEqual(45, DigitsSummer.SumV4("00000000000123456789"));
         }
-
-        
-
     }
 }
