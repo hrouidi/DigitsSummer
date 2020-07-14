@@ -10,8 +10,10 @@ namespace DigitsSummer.Benchmarks
         {
             //Summary summary = BenchmarkRunner.Run<SumBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumFromFileBenchmarks>();
-            Summary summary = BenchmarkRunner.Run<SumLinqBenchmarks>();
+            //Summary summary = BenchmarkRunner.Run<SumLinqBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumHashBenchmarks>();
+            Summary summary = BenchmarkRunner.Run<SumFromFileDataFlowBenchmarks>();
+
         }
     }
 }

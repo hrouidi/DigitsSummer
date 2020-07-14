@@ -9,7 +9,7 @@ namespace DigitsSummer
 {
     public static partial class DigitsSummer
     {
-        private static readonly Dictionary<char, ulong> _hash = new Dictionary<char, ulong>
+        private static readonly Dictionary<char, ulong> Hash = new Dictionary<char, ulong>
         {
             ['0'] = 0ul,
             ['1'] = 1ul,
@@ -39,7 +39,7 @@ namespace DigitsSummer
         {
             ulong ret = 0;
             for (int i = 0; i < data.Length; ++i)
-                ret += _hash[data[i]];
+                ret += Hash[data[i]];
             return ret;
         }
 
@@ -52,7 +52,7 @@ namespace DigitsSummer
         public static ulong SumPLinq(string data)
         {
             return data.AsParallel()
-                .Select(current => _hash[current])
+                .Select(current => Hash[current])
                 .Aggregate((current1, tmp) => current1 + tmp);
         }
 
