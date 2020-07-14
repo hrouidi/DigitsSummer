@@ -4,11 +4,8 @@ using System.Threading.Tasks;
 
 namespace DigitsSummer
 {
-    public static class DigitsSummer
+    public static partial class DigitsSummer
     {
-
-        #region Sum
-
         public static ulong Sum(string data)
         {
             ulong ret = 0;
@@ -71,64 +68,8 @@ namespace DigitsSummer
                 var tmp = ulong.Parse(current);
                 ret += tmp.Sum();
             }
-
             return ret;
         }
-
-        #endregion
-
-        #region Sum from file
-
-        public static ulong SumFromFile(string fileName)
-        {
-            string text = File.ReadAllText(fileName);
-            return Sum(text);
-        }
-
-        public static ulong SumV2FromFile(string fileName)
-        {
-            string text = File.ReadAllText(fileName);
-            return SumV2(text);
-        }
-
-        public static ulong SumV3FromFile(string fileName)
-        {
-            string text = File.ReadAllText(fileName);
-            return SumV3(text);
-        }
-
-        public static ulong SumV3_5FromFile(string fileName)
-        {
-            string text = File.ReadAllText(fileName);
-            return SumV3_5(text);
-        }
-
-        public static ulong SumV4FromFile(string fileName)
-        {
-            Span<char> buffer = stackalloc char[1024];
-            ulong ret = 0;
-            using StreamReader fsSource = new StreamReader(fileName);
-            while (!fsSource.EndOfStream)
-            {
-                var cpt = fsSource.Read(buffer);
-                if (cpt < buffer.Length)
-                    ret += SumV4(buffer.Slice(0, cpt));
-                else
-                    ret += SumV4(buffer);
-            }
-
-            return ret;
-        }
-
-        public static ulong SumV5FromFile(string fileName)
-        {
-            ulong ret = 0;
-
-            
-            return ret;
-        }
-
-        #endregion
 
     }
 }

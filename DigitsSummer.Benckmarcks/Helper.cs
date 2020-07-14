@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using DigitsSummer.Tests;
+using System.Text;
 
 namespace DigitsSummer.Benchmarks
 {
@@ -41,9 +41,19 @@ namespace DigitsSummer.Benchmarks
         {
             if (!File.Exists(fileName))
             {
-                var text = Helper.GenerateData(max);
+                var text = GenerateData(max);
                 File.WriteAllText(fileName, text);
             }
+        }
+
+        public static string GenerateData(int max)
+        {
+            Random random = new Random();
+            var sb = new StringBuilder(max);
+            for (int index = 0; index < max; ++index)
+                sb.Append(random.Next(0, 10));
+
+            return sb.ToString();
         }
     }
 }

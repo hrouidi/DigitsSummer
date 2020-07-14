@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Order;
-using DigitsSummer.Tests;
 
 namespace DigitsSummer.Benchmarks
 {
@@ -23,9 +22,9 @@ namespace DigitsSummer.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _data1M = Helper.GenerateData(1_000_000);
-            _data10M = Helper.GenerateData(10_000_000);
-            _data100M = Helper.GenerateData(100_000_000);
+            _data1M = GlobalSetupHelper.GenerateData(1_000_000);
+            _data10M = GlobalSetupHelper.GenerateData(10_000_000);
+            _data100M = GlobalSetupHelper.GenerateData(100_000_000);
             //_data1G = DigitsSummer.GenerateData(1_000_000_000);
         }
 

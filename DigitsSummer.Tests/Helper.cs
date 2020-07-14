@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitsSummer.Tests
 {
     public class Helper
     {
-        const string DataFile = "../../../data1M.txt";
-
-        public static async Task GenerateDataAsFile(int max)
-        {
-            var data = GenerateData(max);
-            await File.WriteAllTextAsync(DataFile, data);
-        }
-
         public static string GenerateData(int max)
         {
             Random random = new Random();
@@ -24,6 +14,23 @@ namespace DigitsSummer.Tests
                 sb.Append(random.Next(0, 10));
 
             return sb.ToString();
+        }
+
+        public static ulong GenerateDataFile(string fileName, int max)
+        {
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            var text = GenerateData(max);
+            File.WriteAllText(fileName, text);
+            return DigitsSummer.SumV4(text);
+        }
+
+        public static void GenerateDataFile(string fileName, string content)
+        {
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+            File.WriteAllText(fileName, content);
         }
     }
 }
