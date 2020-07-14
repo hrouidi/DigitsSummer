@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Text;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -50,8 +51,9 @@ namespace DigitsSummer
         public static ulong SumV5FromFile(string fileName)
         {
             ulong ret = 0;
+            //Utf8Formatter.TryFormat
 
-
+            //tf8Parser.TryParse()
             return ret;
         }
 
