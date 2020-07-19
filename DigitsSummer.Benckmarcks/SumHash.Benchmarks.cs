@@ -22,9 +22,9 @@ namespace DigitsSummer.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _data1M = GlobalSetupHelper.GenerateData(1_000_000);
-            _data10M = GlobalSetupHelper.GenerateData(10_000_000);
-            _data100M = GlobalSetupHelper.GenerateData(100_000_000);
+            _data1M = GlobalSetupHelper.GenerateDataAsString(1_000_000);
+            _data10M = GlobalSetupHelper.GenerateDataAsString(10_000_000);
+            _data100M = GlobalSetupHelper.GenerateDataAsString(100_000_000);
             //_data1G = DigitsSummer.GenerateData(1_000_000_000);
         }
 

@@ -62,7 +62,14 @@ namespace DigitsSummer.Tests
             ret = DigitsSummer.SumV4FromFile(File1K);
             Assert.AreEqual(_file1KSum, ret);
         }
-
+        [Test]
+        public static void SumFromFileVx2_Tests()
+        {
+            var ret = DigitsSummer.SumVx2FromFile(SmallFile);
+            Assert.AreEqual(SmallFileSum, ret);
+            ret = DigitsSummer.SumVx2FromFile(File1K);
+            Assert.AreEqual(_file1KSum, ret);
+        }
 
     }
 }

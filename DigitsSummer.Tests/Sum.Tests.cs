@@ -69,5 +69,23 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(45, DigitsSummer.SumV4("123456789"));
             Assert.AreEqual(45, DigitsSummer.SumV4("00000000000123456789"));
         }
+
+        [Test]
+        public static void SumVx_Tests()
+        {
+            Assert.AreEqual(0, DigitsSummer.SumVx("000000"));
+            Assert.AreEqual(45, DigitsSummer.SumVx("123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx("00000000000123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+        }
+
+        [Test]
+        public static void SumVx2_Tests()
+        {
+            Assert.AreEqual(1, DigitsSummer.SumVx2("0000001"));
+            Assert.AreEqual(45, DigitsSummer.SumVx2("123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx2("00000000000123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx2("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+        }
     }
 }

@@ -48,11 +48,18 @@ namespace DigitsSummer
             return ret;
         }
 
-        public static ulong SumV5FromFile(string fileName)
+        public static ulong SumVx2FromFile(string fileName, int bufferSize = 1024 * 16)
         {
+            Span<char> buffer = stackalloc char[bufferSize];
+            Span<char> current = buffer;
             ulong ret = 0;
-
-
+            using StreamReader fsSource = new StreamReader(fileName);
+            while (!fsSource.EndOfStream)
+            {
+                var cpt = fsSource.Read(buffer);
+                current = cpt < buffer.Length ? buffer.Slice(0, cpt) : buffer;
+                ret +=  SumVx2(current);
+            }
             return ret;
         }
 

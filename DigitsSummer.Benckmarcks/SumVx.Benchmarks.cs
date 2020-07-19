@@ -11,7 +11,7 @@ namespace DigitsSummer.Benchmarks
     [RankColumn(NumeralSystem.Arabic)]
     [MemoryDiagnoser]
     //[SimpleJob(RunStrategy.Monitoring)]
-    public class SumBenchmarks
+    public class SumVxBenchmarks
     {
         private string _data1M;
         private string _data10M;
@@ -32,61 +32,8 @@ namespace DigitsSummer.Benchmarks
             //_data1G = DigitsSummer.GenerateData(1_000_000_000);
         }
 
+
         [Benchmark(Baseline = true)]
-        public ulong Sum() => Data switch
-        {
-            "1M" => DigitsSummer.Sum(_data1M),
-            "10M" => DigitsSummer.Sum(_data10M),
-            "100M" => DigitsSummer.Sum(_data100M),
-            _ => throw new Exception(),
-        };
-
-        [Benchmark]
-        public ulong SumHash() => Data switch
-        {
-            "1M" => DigitsSummer.SumHash(_data1M),
-            "10M" => DigitsSummer.SumHash(_data10M),
-            "100M" => DigitsSummer.SumHash(_data100M),
-            _ => throw new Exception(),
-        };
-
-        //[Benchmark]
-        //public ulong SumPLinq() => Data switch
-        //{
-        //    "1M" => DigitsSummer.SumPLinq(_data1M),
-        //    "10M" => DigitsSummer.SumPLinq(_data10M),
-        //    "100M" => DigitsSummer.SumPLinq(_data100M),
-        //    _ => throw new Exception(),
-        //};
-
-        //[Benchmark]
-        //public ulong SumV2() => Data switch
-        //{
-        //    "1M" => DigitsSummer.SumV2(_data1M),
-        //    "10M" => DigitsSummer.SumV2(_data10M),
-        //    "100M" => DigitsSummer.SumV2(_data100M),
-        //    _ => throw new Exception(),
-        //};
-
-        //[Benchmark()]
-        //public ulong SumV3() => Data switch
-        //{
-        //    "1M" => DigitsSummer.SumV3(_data1M),
-        //    "10M" => DigitsSummer.SumV3(_data10M),
-        //    "100M" => DigitsSummer.SumV3(_data100M),
-        //    _ => throw new Exception(),
-        //};
-
-        [Benchmark]
-        public ulong SumV3_5() => Data switch
-        {
-            "1M" => DigitsSummer.SumV3_5(_data1M),
-            "10M" => DigitsSummer.SumV3_5(_data10M),
-            "100M" => DigitsSummer.SumV3_5(_data100M),
-            _ => throw new Exception(),
-        };
-
-        [Benchmark]
         public ulong SumV4() => Data switch
         {
             "1M" => DigitsSummer.SumV4(_data1M),
@@ -94,6 +41,7 @@ namespace DigitsSummer.Benchmarks
             "100M" => DigitsSummer.SumV4(_data100M),
             _ => throw new Exception(),
         };
+
 
         [Benchmark]
         public ulong SumVx() => Data switch

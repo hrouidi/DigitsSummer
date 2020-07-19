@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using DigitsSummer.Benchmarks.Micro;
 
 namespace DigitsSummer.Benchmarks
 {
@@ -12,7 +13,9 @@ namespace DigitsSummer.Benchmarks
             //Summary summary = BenchmarkRunner.Run<SumFromFileBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumLinqBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumHashBenchmarks>();
-            Summary summary = BenchmarkRunner.Run<SumFromFileDataFlowBenchmarks>();
+            //Summary summary = BenchmarkRunner.Run<HashVsParseBenchmarks>();
+            //Summary summary = BenchmarkRunner.Run<SumFromFileDataFlowBenchmarks>();
+            Summary summary = BenchmarkRunner.Run<SumVxBenchmarks>();
 
         }
     }

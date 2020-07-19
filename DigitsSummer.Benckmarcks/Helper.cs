@@ -30,6 +30,10 @@ namespace DigitsSummer.Benchmarks
                         GenerateDataFileIfDoesNotExist("data1G.txt", 1_000_000_000);
                         ret.Add(param, "data1G.txt");
                         break;
+                    case "2G":
+                        GenerateDataFileIfDoesNotExist("data2G.txt", 2_000_000_000);
+                        ret.Add(param, "data2G.txt");
+                        break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -41,18 +45,41 @@ namespace DigitsSummer.Benchmarks
         {
             if (!File.Exists(fileName))
             {
-                var text = GenerateData(max);
-                File.WriteAllText(fileName, text);
+                Console.WriteLine("Generating data file");
+                using TextWriter writeFile = new StreamWriter(fileName);
+                foreach (var text in GenerateData(max))
+                    writeFile.Write(text);
+                writeFile.Flush();
+                writeFile.Close();
             }
         }
 
-        public static string GenerateData(int max)
+        public static IEnumerable<string> GenerateData(int max)
+        {
+            const int bufferSize = 1024 * 16;
+            Random random = new Random();
+            var sb = new StringBuilder(max);
+            for (int index = 0; index < max; ++index)
+            {
+                sb.Append(random.Next(0, 10));
+                if (index % bufferSize == 0)
+                {
+                    var ret = sb.ToString();
+                    sb.Clear();
+                    yield return ret;
+                }
+            }
+            if (sb.Length > 0)
+                yield return sb.ToString();
+
+        }
+
+        public static string GenerateDataAsString(int max)
         {
             Random random = new Random();
             var sb = new StringBuilder(max);
             for (int index = 0; index < max; ++index)
                 sb.Append(random.Next(0, 10));
-
             return sb.ToString();
         }
     }

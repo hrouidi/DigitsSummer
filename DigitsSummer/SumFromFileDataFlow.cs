@@ -9,7 +9,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace DigitsSummer
 {
-    public static class SumFromFileDataFlow
+    public static class PipelineV1
     {
         private static long _result;
 
@@ -22,47 +22,131 @@ namespace DigitsSummer
                 using var reader = new StreamReader(fileName);
                 while (!reader.EndOfStream)
                 {
-
-                    var buffer = MemoryPool<char>.Shared.Rent(bufferSize).Memory; ;
-                    var ret = reader.ReadBlockAsync(buffer).AsTask().Result;
+                    var lease = MemoryPool<char>.Shared.Rent(bufferSize);
+                    var ret = reader.Read(lease.Memory.Span);
                     if (ret < bufferSize)
-                        yield return buffer.Slice(0, ret);
+                        yield return lease.Memory.Slice(0, ret);
                     else
-                        yield return buffer;
+                        yield return lease.Memory;
                 }
             }
         }
 
-        private static TransformBlock<ReadOnlyMemory<char>, ulong> BuildSumBlock()
+        private static ActionBlock<ReadOnlyMemory<char>> BuildSumBlock(int maxDegreeOfParallelism)
         {
-            var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-            return new TransformBlock<ReadOnlyMemory<char>, ulong>(data => DigitsSummer.SumV4(data.Span), options);
+            if (maxDegreeOfParallelism == 0)
+            {
+                return new ActionBlock<ReadOnlyMemory<char>>(data =>
+                {
+                    var ret = DigitsSummer.SumV4(data.Span);
+                    Interlocked.Add(ref _result, (long)ret);
+                });
+            }
+            var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism };
+            return new ActionBlock<ReadOnlyMemory<char>>(data =>
+            {
+                var ret = DigitsSummer.SumV4(data.Span);
+                Interlocked.Add(ref _result, (long)ret);
+            }, options);
         }
 
-        private static ActionBlock<ulong> BuildAccumulator()
-        {
-            return new ActionBlock<ulong>(ret => Interlocked.Add(ref _result, (long)ret));
-        }
-
-        private static (ITargetBlock<string>, IDataflowBlock) CreatePipeline(int bufferSize)
+        private static (ITargetBlock<string>, IDataflowBlock) CreatePipeline(int bufferSize, int maxDegreeOfParallelism)
         {
             var options = new DataflowLinkOptions { PropagateCompletion = true };
             var head = BuildReader(bufferSize);
-            var sumBlock = BuildSumBlock();
-            var acc = BuildAccumulator();
+            var sumBlock = BuildSumBlock(maxDegreeOfParallelism);
             head.LinkTo(sumBlock, options);
-            sumBlock.LinkTo(acc, options);
-            return (head, acc);
+            return (head, sumBlock);
         }
 
-        public static ulong SumV5FromFile(string fileName, int bufferSize = 1024 * 16)
+        public static ulong Run(string fileName, int maxDegreeOfParallelism, int bufferSize = 1024 * 16)
         {
+            if (maxDegreeOfParallelism == -1)
+                maxDegreeOfParallelism = Environment.ProcessorCount - 1;
             Interlocked.Exchange(ref _result, 0);
-            var (head, acc) = CreatePipeline(bufferSize);
+            var (head, acc) = CreatePipeline(bufferSize, maxDegreeOfParallelism);
             head.Post(fileName);
             head.Complete();
             acc.Completion.Wait();
             return (ulong)Interlocked.Read(ref _result);
+        }
+    }
+
+    public static class PipelineV2
+    {
+        private static long _result;
+
+        private static TransformManyBlock<string, (IMemoryOwner<char>, int?)> BuildReader(int bufferSize)
+        {
+            return new TransformManyBlock<string, (IMemoryOwner<char>, int?)>(ReadLines);
+
+            IEnumerable<(IMemoryOwner<char>, int?)> ReadLines(string fileName)
+            {
+                using var reader = new StreamReader(fileName);
+                while (!reader.EndOfStream)
+                {
+                    IMemoryOwner<char> lease = MemoryPool<char>.Shared.Rent(bufferSize);
+
+                    int ret = reader.Read(lease.Memory.Span);
+                    if (ret < bufferSize)
+                        yield return (lease, ret);
+                    else
+                        yield return (lease, null);
+                }
+            }
+        }
+
+        private static ActionBlock<(IMemoryOwner<char>, int?)> BuildSumBlock(int maxDegreeOfParallelism)
+        {
+            static void Sum((IMemoryOwner<char>, int?) data)
+            {
+                var (memory, size) = data;
+                ulong ret;
+                if (size.HasValue)
+                    ret = DigitsSummer.SumV4(memory.Memory.Span.Slice(0, size.Value));
+                else
+                    ret = DigitsSummer.SumV4(memory.Memory.Span);
+                Interlocked.Add(ref _result, (long)ret);
+                memory.Dispose();
+            }
+
+            if (maxDegreeOfParallelism == 0)
+                return new ActionBlock<(IMemoryOwner<char>, int?)>(Sum);
+            return new ActionBlock<(IMemoryOwner<char>, int?)>(Sum, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism });
+        }
+
+        private static (ITargetBlock<string>, IDataflowBlock) CreatePipeline(int bufferSize, int maxDegreeOfParallelism)
+        {
+            var options = new DataflowLinkOptions { PropagateCompletion = true };
+            var head = BuildReader(bufferSize);
+            var sumBlock = BuildSumBlock(maxDegreeOfParallelism);
+            head.LinkTo(sumBlock, options);
+            return (head, sumBlock);
+        }
+
+        public static ulong Run(string fileName, int maxDegreeOfParallelism, int bufferSize = 1024 * 16)
+        {
+            if (maxDegreeOfParallelism == -1)
+                maxDegreeOfParallelism = Environment.ProcessorCount - 1;
+            Interlocked.Exchange(ref _result, 0);
+            var (head, acc) = CreatePipeline(bufferSize, maxDegreeOfParallelism);
+            head.Post(fileName);
+            head.Complete();
+            acc.Completion.Wait();
+            return (ulong)Interlocked.Read(ref _result);
+        }
+    }
+
+    public static class SumFromFileDataFlow
+    {
+        public static ulong SumV5FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        {
+            return PipelineV1.Run(fileName, maxDegreeOfParallelism, bufferSize);
+        }
+
+        public static ulong SumV6FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        {
+            return PipelineV2.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
     }
