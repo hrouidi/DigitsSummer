@@ -14,8 +14,8 @@ namespace DigitsSummer.Benchmarks
             //Summary summary = BenchmarkRunner.Run<SumLinqBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumHashBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<HashVsParseBenchmarks>();
-            //Summary summary = BenchmarkRunner.Run<SumFromFileDataFlowBenchmarks>();
-            Summary summary = BenchmarkRunner.Run<SumVxBenchmarks>();
+            Summary summary = BenchmarkRunner.Run<SumFromFileDataFlowBenchmarks>();
+            //Summary summary = BenchmarkRunner.Run<SumVxBenchmarks>();
 
         }
     }

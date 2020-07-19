@@ -32,10 +32,18 @@ namespace DigitsSummer.Tests
         [Test]
         public static void SumFromFileV6_Tests()
         {
-            //var rettt = Marshal.SizeOf(typeof(ReadOnlyMemory<char>));
             var ret = SumFromFileDataFlow.SumV6FromFile(SmallFile, 15);
             Assert.AreEqual(SmallFileSum, ret);
             ret = SumFromFileDataFlow.SumV5FromFile(File1K);
+            Assert.AreEqual(_file1KSum, ret);
+        }
+
+        [Test]
+        public static void SumFromFileVx2_Tests()
+        {
+            var ret = SumFromFileDataFlow.SumVx2FromFile(SmallFile, 15);
+            Assert.AreEqual(SmallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx2FromFile(File1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
