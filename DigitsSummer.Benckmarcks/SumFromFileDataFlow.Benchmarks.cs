@@ -24,6 +24,11 @@ namespace DigitsSummer.Benchmarks
         //[Params(0,1,2,4,8,11,12,16)]
         //public int MaxDegreeOfParallelism { get; set; }
         private const string Data = "2G";
+
+        [Params(1024* 16/*,1024*64,1024*256,1024*1024,1024*1024*32*/)]
+        public int BufferSize{ get; set; }
+
+
         [GlobalSetup]
         public void GlobalSetup()
         {
@@ -46,31 +51,13 @@ namespace DigitsSummer.Benchmarks
         //public ulong SumFromFileDataFlowV2() => SumFromFileDataFlow.SumV6FromFile(_fileMap[Data]);
 
         //[Benchmark]
-        public ulong SumFromFileDataFlowVx2() => SumFromFileDataFlow.SumVx2FromFile(_fileMap[Data]);
+        public ulong SumFromFileDataFlowVx2() => SumFromFileDataFlow.SumVx2FromFile(_fileMap[Data], BufferSize);
 
         [Benchmark]
-        public ulong SumFromFileDataFlowVx3() => SumFromFileDataFlow.SumVx3FromFile(_fileMap[Data]);
+        public ulong SumFromFileDataFlowVx3() => SumFromFileDataFlow.SumVx3FromFile(_fileMap[Data], BufferSize);
 
         [Benchmark]
-        public ulong SumFromFileDataFlowVx4() => SumFromFileDataFlow.SumVx4FromFile(_fileMap[Data]);
+        public ulong SumFromFileDataFlowVx4() => SumFromFileDataFlow.SumVx4FromFile(_fileMap[Data], BufferSize);
 
-        //[Benchmark]
-        //public ulong SumV5FromFile1() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 1);
-
-        //[Benchmark]
-        //public ulong SumV5FromFile2() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 2);
-
-        //[Benchmark]
-        //public ulong SumV5FromFile4() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 4);
-        //[Benchmark]
-        //public ulong SumV5FromFile8() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 8);
-        //[Benchmark]
-        //public ulong SumV5FromFile11() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 11);
-
-        //[Benchmark]
-        //public ulong SumV5FromFile12() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 12);
-
-        //[Benchmark]
-        //public ulong SumV5FromFile16() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 16);
     }
 }

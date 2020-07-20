@@ -200,7 +200,7 @@ namespace DigitsSummer
     public static class PipelineVx3
     {
         private static long _result;
-        private static readonly AsyncLocal<Vector256<long>> LocalAccVx = new AsyncLocal<Vector256<long>>();
+        private static readonly ThreadLocal<Vector256<long>> LocalAccVx = new ThreadLocal<Vector256<long>>();
 
         private static TransformManyBlock<string, IMemoryOwner<char>> BuildReader(int bufferSize)
         {
@@ -333,29 +333,29 @@ namespace DigitsSummer
 
     public static class SumFromFileDataFlow
     {
-        public static ulong SumV5FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        public static ulong SumV5FromFile(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
             return PipelineV1.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
-        public static ulong SumV6FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        public static ulong SumV6FromFile(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
             return PipelineV2.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
-        public static ulong SumVx2FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        public static ulong SumVx2FromFile(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
             return PipelineVx2.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
-        public static ulong SumVx3FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        public static ulong SumVx3FromFile(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
             return PipelineVx3.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
-        public static ulong SumVx4FromFile(string fileName, int maxDegreeOfParallelism = -1, int bufferSize = 1024 * 16)
+        public static ulong SumVx4FromFile(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
-            return PipelineVx3.Run(fileName, maxDegreeOfParallelism, bufferSize);
+            return PipelineVx4.Run(fileName, maxDegreeOfParallelism, bufferSize);
         }
 
     }

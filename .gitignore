@@ -342,3 +342,4 @@ healthchecksdb
 /Data/data1G.txt
 /Data/data10M.txt
 /Data/data100M.txt
+*.txt

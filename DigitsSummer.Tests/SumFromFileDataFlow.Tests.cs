@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using System;
-using System.Runtime.InteropServices;
 
 namespace DigitsSummer.Tests
 {
@@ -21,7 +19,7 @@ namespace DigitsSummer.Tests
 
 
         [Test]
-        public static void SumFromFileV5_Tests()
+        public static void SumV5FromFile_Test()
         {
             var ret = SumFromFileDataFlow.SumV5FromFile(SmallFile,15);
             Assert.AreEqual(SmallFileSum, ret);
