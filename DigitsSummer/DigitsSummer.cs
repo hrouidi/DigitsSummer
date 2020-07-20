@@ -164,7 +164,12 @@ namespace DigitsSummer
             return ret;
         }
 
-        public static unsafe ulong SumVx2(in ReadOnlySpan<char> data)
+        public static ulong SumVx2(in ReadOnlySpan<char> data)
+        {
+            return (ulong)SumVx2A(data);
+        }
+
+        public static unsafe long SumVx2A(in ReadOnlySpan<char> data)
         {
             long ret = 0;
             var accVector = Vector256<long>.Zero;
@@ -172,7 +177,7 @@ namespace DigitsSummer
             long zero = 48L;
             var _48 = Avx2.BroadcastScalarToVector256(&zero);
             int index = 0;
-            for (; index +size< data.Length; index += size)
+            for (; index + size < data.Length; index += size)
             {
                 var current = data.Slice(index, Math.Min(size, data.Length - index));
                 var bytes = MemoryMarshal.Cast<char, ushort>(current);
@@ -189,7 +194,30 @@ namespace DigitsSummer
             // remaining digits: Max 3 digits
             for (; index < data.Length; ++index)
                 ret += HashInt64[data[index]];
-            return (ulong)ret;
+            return ret;
+        }
+
+        //Assume that data.Length % Vector256<long>.Count == 0
+        public static unsafe Vector256<long> SumVx3(in ReadOnlySpan<char> data)
+        {
+            long ret = 0;
+            var accVector = Vector256<long>.Zero;
+            int size = Vector256<long>.Count;
+            long zero = 48L;
+            var _48 = Avx2.BroadcastScalarToVector256(&zero);
+            int index = 0;
+            for (; index + size < data.Length; index += size)
+            {
+                var current = data.Slice(index, Math.Min(size, data.Length - index));
+                var bytes = MemoryMarshal.Cast<char, ushort>(current);
+                fixed (ushort* pStart = bytes)
+                {
+                    var bytesVx = Avx2.ConvertToVector256Int64(pStart);
+                    var ori = Avx2.Subtract(bytesVx, _48);
+                    accVector = Avx2.Add(accVector, ori);
+                }
+            }
+            return accVector;
         }
 
     }

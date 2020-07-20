@@ -7,6 +7,7 @@ namespace DigitsSummer.Benchmarks
 {
     public static class GlobalSetupHelper
     {
+        private const string DataDirectory = @"D:\WorkSpace\Perso\DigitsSummer\Data";
         public static Dictionary<string, string> GenerateDataFilesIfDoesNotExist(params string[] @params)
         {
             Dictionary<string, string> ret = new Dictionary<string, string>();
@@ -16,23 +17,23 @@ namespace DigitsSummer.Benchmarks
                 {
                     case "1M":
                         GenerateDataFileIfDoesNotExist("data1M.txt", 1_000_000);
-                        ret.Add(param, "data1M.txt");
+                        ret.Add(param, Path.Combine(DataDirectory, "data1M.txt"));
                         break;
                     case "10M":
                         GenerateDataFileIfDoesNotExist("data10M.txt", 10_000_000);
-                        ret.Add(param, "data10M.txt");
+                        ret.Add(param, Path.Combine(DataDirectory, "data10M.txt"));
                         break;
                     case "100M":
                         GenerateDataFileIfDoesNotExist("data100M.txt", 100_000_000);
-                        ret.Add(param, "data100M.txt");
+                        ret.Add(param, Path.Combine(DataDirectory, "data100M.txt"));
                         break;
                     case "1G":
                         GenerateDataFileIfDoesNotExist("data1G.txt", 1_000_000_000);
-                        ret.Add(param, "data1G.txt");
+                        ret.Add(param, Path.Combine(DataDirectory, "data1G.txt"));
                         break;
                     case "2G":
                         GenerateDataFileIfDoesNotExist("data2G.txt", 2_000_000_000);
-                        ret.Add(param, "data2G.txt");
+                        ret.Add(param, Path.Combine(DataDirectory, "data2G.txt"));
                         break;
                     default:
                         throw new NotImplementedException();
@@ -43,10 +44,11 @@ namespace DigitsSummer.Benchmarks
 
         private static void GenerateDataFileIfDoesNotExist(string fileName, int max)
         {
-            if (!File.Exists(fileName))
+            var path = Path.Combine(DataDirectory, fileName);
+            if (!File.Exists(path))
             {
-                Console.WriteLine("Generating data file");
-                using TextWriter writeFile = new StreamWriter(fileName);
+                Console.WriteLine($"Generating data file @ : {path}");
+                using TextWriter writeFile = new StreamWriter(path);
                 foreach (var text in GenerateData(max))
                     writeFile.Write(text);
                 writeFile.Flush();

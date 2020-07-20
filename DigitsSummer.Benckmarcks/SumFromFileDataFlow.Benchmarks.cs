@@ -40,13 +40,19 @@ namespace DigitsSummer.Benchmarks
 
         //[Benchmark]
         [Benchmark(Baseline = true)]
-        public ulong SumFromFileDataFlowV1() => SumFromFileDataFlow.SumV5FromFile(_fileMap[Data]);
+        //public ulong SumFromFileDataFlowV1() => SumFromFileDataFlow.SumV5FromFile(_fileMap[Data]);
 
-        [Benchmark]
-        public ulong SumFromFileDataFlowV2() => SumFromFileDataFlow.SumV6FromFile(_fileMap[Data]);
+        //[Benchmark]
+        //public ulong SumFromFileDataFlowV2() => SumFromFileDataFlow.SumV6FromFile(_fileMap[Data]);
 
-        [Benchmark]
+        //[Benchmark]
         public ulong SumFromFileDataFlowVx2() => SumFromFileDataFlow.SumVx2FromFile(_fileMap[Data]);
+
+        [Benchmark]
+        public ulong SumFromFileDataFlowVx3() => SumFromFileDataFlow.SumVx3FromFile(_fileMap[Data]);
+
+        [Benchmark]
+        public ulong SumFromFileDataFlowVx4() => SumFromFileDataFlow.SumVx4FromFile(_fileMap[Data]);
 
         //[Benchmark]
         //public ulong SumV5FromFile1() => SumFromFileDataFlow.SumV5FromFile(_fileMap["1G"], 1);

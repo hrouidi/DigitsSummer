@@ -47,5 +47,23 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(_file1KSum, ret);
         }
 
+        [Test]
+        public static void SumFromFileVx3_Tests()
+        {
+            var ret = SumFromFileDataFlow.SumVx3FromFile(SmallFile, 15);
+            Assert.AreEqual(SmallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx3FromFile(File1K);
+            Assert.AreEqual(_file1KSum, ret);
+        }
+
+        [Test]
+        public static void SumFromFileVx4_Tests()
+        {
+            var ret = SumFromFileDataFlow.SumVx4FromFile(SmallFile, 15);
+            Assert.AreEqual(SmallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx4FromFile(File1K);
+            Assert.AreEqual(_file1KSum, ret);
+        }
+
     }
 }
