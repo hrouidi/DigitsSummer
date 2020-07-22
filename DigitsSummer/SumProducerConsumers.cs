@@ -18,7 +18,7 @@ namespace DigitsSummer
         private readonly int _maxDegreeOfParallelism;
         private readonly string _fileName;
 
-        private readonly Action[] _consumers;
+        private readonly Action[] _workers;
 
         public SumProducerConsumers(string fileName, int maxDegreeOfParallelism, int bufferSize = 1024 * 16)
         {
@@ -26,25 +26,28 @@ namespace DigitsSummer
             _bufferSize = bufferSize;
             _maxDegreeOfParallelism = maxDegreeOfParallelism;
             _blocks = new BlockingCollection<IMemoryOwner<char>>();
-            _consumers = Enumerable.Range(1, _maxDegreeOfParallelism)
-                .Select(i => (Action)ConsumeTask)
-                .ToArray();
+            //_producer = new Task(Produce);
+            _workers = Enumerable.Range(1, _maxDegreeOfParallelism-1)
+                                 .Select(i => (Action)ConsumeTask)
+                                 .Append(ProduceTask)
+                                 .Reverse()
+                                 .ToArray();
         }
 
-        private async Task Produce()
+        private void ProduceTask()
         {
             using var reader = new StreamReader(_fileName);
             while (true)
             {
                 IMemoryOwner<char> lease = MemoryPool<char>.Shared.Rent(_bufferSize);
-                int ret = await reader.ReadAsync(lease.Memory);
+                int ret = reader.Read(lease.Memory.Span);
                 if (ret >= _bufferSize)
                     _blocks.Add(lease);
                 else// last chunk => compute sum directly here
                 {
                     _blocks.CompleteAdding();
-                    var sum = DigitsSummer.SumVx2(lease.Memory.Span.Slice(0, ret));
-                    Interlocked.Add(ref _result, (long)sum);
+                    var sum = DigitsSummer.SumVx2A(lease.Memory.Span.Slice(0, ret));
+                    Interlocked.Add(ref _result, sum);
                     lease.Dispose();
                     break;
                 }
@@ -67,19 +70,17 @@ namespace DigitsSummer
 
         private long Run()
         {
-            var producer = Produce();
-            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism }, _consumers);
-            producer.Wait();
+            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism }, _workers);
             return Interlocked.Read(ref _result);
         }
 
-        public static ulong Run(string fileName,  int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
+        public static ulong Run(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
         {
             if (maxDegreeOfParallelism == -1)
-                maxDegreeOfParallelism = Environment.ProcessorCount - 1;
+                maxDegreeOfParallelism = Environment.ProcessorCount;
 
             var pc = new SumProducerConsumers(fileName, maxDegreeOfParallelism, bufferSize);
-            return (ulong)pc.Run(); 
+            return (ulong)pc.Run();
         }
     }
 }

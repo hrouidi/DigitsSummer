@@ -20,8 +20,8 @@ namespace DigitsSummer.Benchmarks
         private Dictionary<string, int> _sizes = new Dictionary<string, int>
         {
             ["32K"] = 1024 * 16,
-            ["128K"] = 1024 * 32,
-            ["32K"] = 1024 * 64,
+            ["64K"] = 1024 * 32,
+            ["128K"] = 1024 * 64,
             ["256K"] = 1024 * 128,
             ["512K"] = 1024 * 256,
             ["1M"] = 1024 * 512,
@@ -32,7 +32,7 @@ namespace DigitsSummer.Benchmarks
             ["128M"] = 1024 * 1024 * 64,
         };
 
-        public IEnumerable<string> BufferSizeParamsSource => _sizes.Keys.Take(6);
+        public IEnumerable<string> BufferSizeParamsSource => _sizes.Keys.Take(3);
 
         //[Params(0,1,2,4,8,11,12,16)]
         //public int MaxDegreeOfParallelism { get; set; }
