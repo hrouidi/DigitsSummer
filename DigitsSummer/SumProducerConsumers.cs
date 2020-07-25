@@ -27,7 +27,7 @@ namespace DigitsSummer
             _maxDegreeOfParallelism = maxDegreeOfParallelism;
             _blocks = new BlockingCollection<IMemoryOwner<char>>();
             //_producer = new Task(Produce);
-            _workers = Enumerable.Range(1, _maxDegreeOfParallelism-1)
+            _workers = Enumerable.Range(1, _maxDegreeOfParallelism - 1)
                                  .Select(i => (Action)ConsumeTask)
                                  .Append(ProduceTask)
                                  .Reverse()
@@ -53,7 +53,7 @@ namespace DigitsSummer
                 }
             }
         }
-
+        
         private void ConsumeTask()
         {
             Vector256<long> localAccVx = Vector256<long>.Zero;
@@ -80,6 +80,68 @@ namespace DigitsSummer
                 maxDegreeOfParallelism = Environment.ProcessorCount;
 
             var pc = new SumProducerConsumers(fileName, maxDegreeOfParallelism, bufferSize);
+            return (ulong)pc.Run();
+        }
+    }
+
+    public class SumInMemoryFakeProducerConsumers
+    {
+        private long _result;
+        private readonly BlockingCollection<ReadOnlyMemory<char>> _blocks;
+        private readonly int _bufferSize;
+        private readonly int _maxDegreeOfParallelism;
+        private readonly string _fileName;
+
+        private readonly Action[] _workers;
+
+        public SumInMemoryFakeProducerConsumers(string fileName, int maxDegreeOfParallelism, int bufferSize = 1024 * 16)
+        {
+            _fileName = fileName;
+            _bufferSize = bufferSize;
+            _maxDegreeOfParallelism = maxDegreeOfParallelism;
+            _blocks = new BlockingCollection<ReadOnlyMemory<char>>();
+            _workers = Enumerable.Range(1, _maxDegreeOfParallelism - 1)
+                                 .Select(i => (Action)ConsumeTask)
+                                 .Append(ProduceTask)
+                                 .Reverse()
+                                 .ToArray();
+        }
+
+        private void ProduceTask()
+        {
+            Memory<char> tmp = new Memory<char>(new char[_bufferSize]);
+            for (int i = 1; i < 2_000_000_000 / _bufferSize; ++i)
+            {
+                _blocks.Add(tmp);
+            }
+            _blocks.CompleteAdding();
+        }
+
+        private void ConsumeTask()
+        {
+            Vector256<long> localAccVx = Vector256<long>.Zero;
+            foreach (var block in _blocks.GetConsumingEnumerable())
+            {
+                localAccVx = Avx2.Add(localAccVx, DigitsSummer.SumVx3(block.Span));
+            }
+            long localRet = 0;
+            for (int i = 0; i < Vector256<long>.Count; ++i)
+                localRet += localAccVx.GetElement(i);
+            Interlocked.Add(ref _result, localRet);
+        }
+
+        private long Run()
+        {
+            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism }, _workers);
+            return Interlocked.Read(ref _result);
+        }
+
+        public static ulong Run(string fileName, int bufferSize = 1024 * 16, int maxDegreeOfParallelism = -1)
+        {
+            if (maxDegreeOfParallelism == -1)
+                maxDegreeOfParallelism = Environment.ProcessorCount;
+
+            var pc = new SumInMemoryFakeProducerConsumers(fileName, maxDegreeOfParallelism, bufferSize);
             return (ulong)pc.Run();
         }
     }

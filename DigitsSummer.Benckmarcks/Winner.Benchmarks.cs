@@ -60,5 +60,8 @@ namespace DigitsSummer.Benchmarks
         [Benchmark]
         public ulong Sum_FS_ProducerConsumers_VX3() => SumProducerConsumers.Run(_fileMap[Data], _sizes[BufferSize]);
 
+        [Benchmark]
+        public ulong Sum_InMemoryFake_ProducerConsumers_VX3() => SumInMemoryFakeProducerConsumers.Run(_fileMap[Data], _sizes[BufferSize]);
+
     }
 }
