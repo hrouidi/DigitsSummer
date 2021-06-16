@@ -1,16 +1,11 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Order;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace DigitsSummer.Benchmarks
 {
     [Outliers(OutlierMode.DontRemove)]
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(NumeralSystem.Arabic)]
     [MemoryDiagnoser]
-    //[SimpleJob(RunStrategy.Monitoring)]
     public class SumBenchmarks
     {
         private string _data1M;

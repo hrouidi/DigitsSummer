@@ -17,20 +17,20 @@ namespace DigitsSummer.Benchmarks
     {
         private Dictionary<string, string> _fileMap;
 
-        private Dictionary<string, int> _sizes = new Dictionary<string, int>
-        {
-            ["32K"] = 1024 * 16,
-            ["64K"] = 1024 * 32,
-            ["128K"] = 1024 * 64,
-            ["256K"] = 1024 * 128,
-            ["512K"] = 1024 * 256,
-            ["1M"] = 1024 * 512,
-            ["2M"] = 1024 * 1024,
-            ["4M"] = 1024 * 1024 * 2,
-            ["32M"] = 1024 * 1024 * 16,
-            ["64M"] = 1024 * 1024 * 32,
-            ["128M"] = 1024 * 1024 * 64,
-        };
+        private Dictionary<string, int> _sizes = new()
+                                                 {
+                                                           ["32K"] = 1024 * 16,
+                                                           ["64K"] = 1024 * 32,
+                                                           ["128K"] = 1024 * 64,
+                                                           ["256K"] = 1024 * 128,
+                                                           ["512K"] = 1024 * 256,
+                                                           ["1M"] = 1024 * 512,
+                                                           ["2M"] = 1024 * 1024,
+                                                           ["4M"] = 1024 * 1024 * 2,
+                                                           ["32M"] = 1024 * 1024 * 16,
+                                                           ["64M"] = 1024 * 1024 * 32,
+                                                           ["128M"] = 1024 * 1024 * 64,
+                                                       };
 
         public IEnumerable<string> BufferSizeParamsSource => _sizes.Keys.Take(3);
 
@@ -38,7 +38,7 @@ namespace DigitsSummer.Benchmarks
         //public int MaxDegreeOfParallelism { get; set; }
 
         //private const string Data = "2G";
-        [Params("2G")]
+        [Params("100M")]
         public string Data{ get; set; }
 
         [ParamsSource(nameof(BufferSizeParamsSource))]

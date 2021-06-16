@@ -36,12 +36,12 @@ namespace DigitsSummer
         {
             Span<char> buffer = stackalloc char[bufferSize];
             ulong ret = 0;
-            using StreamReader fsSource = new StreamReader(fileName);
+            using StreamReader fsSource = new(fileName);
             while (!fsSource.EndOfStream)
             {
                 var cpt = fsSource.Read(buffer);
                 if (cpt < buffer.Length)
-                    ret += SumV4(buffer.Slice(0, cpt));
+                    ret += SumV4(buffer[..cpt]);
                 else
                     ret += SumV4(buffer);
             }
@@ -53,11 +53,11 @@ namespace DigitsSummer
             Span<char> buffer = stackalloc char[bufferSize];
             Span<char> current = buffer;
             ulong ret = 0;
-            using StreamReader fsSource = new StreamReader(fileName);
+            using StreamReader fsSource = new(fileName);
             while (!fsSource.EndOfStream)
             {
                 var cpt = fsSource.Read(buffer);
-                current = cpt < buffer.Length ? buffer.Slice(0, cpt) : buffer;
+                current = cpt < buffer.Length ? buffer[..cpt] : buffer;
                 ret +=  SumVx2(current);
             }
             return ret;

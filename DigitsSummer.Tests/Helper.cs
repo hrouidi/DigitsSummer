@@ -8,7 +8,7 @@ namespace DigitsSummer.Tests
     {
         public static string GenerateData(int max)
         {
-            Random random = new Random();
+            Random random = new();
             var sb = new StringBuilder(max);
             for (int index = 0; index < max; ++index)
                 sb.Append(random.Next(0, 10));

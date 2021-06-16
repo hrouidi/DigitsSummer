@@ -1,3 +1,4 @@
+using DigitsSummer.Benchmarks;
 using NUnit.Framework;
 
 namespace DigitsSummer.Tests
@@ -86,6 +87,42 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(45, DigitsSummer.SumVx2("123456789"));
             Assert.AreEqual(45, DigitsSummer.SumVx2("00000000000123456789"));
             Assert.AreEqual(45, DigitsSummer.SumVx2("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+        }
+
+        [Test]
+        public static void SumVx22_Tests()
+        {
+            Assert.AreEqual(1, DigitsSummer.SumVx22("0000001"));
+            Assert.AreEqual(45, DigitsSummer.SumVx22("123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx22("00000000000123456789"));
+            Assert.AreEqual(45, DigitsSummer.SumVx22("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+        }
+
+        [Test]
+        [TestCase("0000001",1ul)]
+        [TestCase("123456789",45ul)]
+        [TestCase("00000000000123456789", 45ul)]
+        [TestCase("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 45ul)]
+        public static void SumVx23_Tests(string data,ulong expected )
+        {
+            Assert.AreEqual(expected, DigitsSummer.SumVx23(data));
+        }
+
+        [Test]
+        public static void Debug()
+        {
+            DigitsSummer.SumVxAdaptative("");
+            var input = GlobalSetupHelper.GenerateDataAsString(100_000_000);
+
+            ulong actual =DigitsSummer.SumVx22(input);
+            ulong expected =DigitsSummer.SumVx2(input);
+            Assert.AreEqual(actual, expected);
+
+            //DigitsSummer.SumVx22("1234");
+            //DigitsSummer.SumVx22("12345");
+            //DigitsSummer.SumVx22("123456");
+            //DigitsSummer.SumVx22("1234567");
+            //DigitsSummer.SumVx22("12345678");
         }
     }
 }

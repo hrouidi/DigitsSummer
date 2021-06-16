@@ -200,7 +200,7 @@ namespace DigitsSummer
     public static class PipelineVx3
     {
         private static long _result;
-        private static readonly ThreadLocal<Vector256<long>> LocalAccVx = new ThreadLocal<Vector256<long>>();
+        private static readonly ThreadLocal<Vector256<long>> _localAccVx = new();
 
         private static TransformManyBlock<string, IMemoryOwner<char>> BuildReader(int bufferSize)
         {
@@ -229,7 +229,7 @@ namespace DigitsSummer
         {
             static void Sum(IMemoryOwner<char> owner)
             {
-                LocalAccVx.Value = Avx2.Add(LocalAccVx.Value, DigitsSummer.SumVx3(owner.Memory.Span));
+                _localAccVx.Value = Avx2.Add(_localAccVx.Value, DigitsSummer.SumVx3(owner.Memory.Span));
                 owner.Dispose();
             }
             if (maxDegreeOfParallelism == 0)
@@ -250,7 +250,7 @@ namespace DigitsSummer
         {
             long localRet = 0;
             for (int i = 0; i < Vector256<long>.Count; ++i)
-                localRet += LocalAccVx.Value.GetElement(i);
+                localRet += _localAccVx.Value.GetElement(i);
             Interlocked.Add(ref _result, localRet);
         }
 

@@ -23,7 +23,7 @@ namespace DigitsSummer.Benchmarks
 
         //[Params(0,1,2,4,8,11,12,16)]
         //public int MaxDegreeOfParallelism { get; set; }
-        private const string Data = "2G";
+        private const string _data = "2G";
 
         [Params(1024* 16/*,1024*64,1024*256,1024*1024,1024*1024*32*/)]
         public int BufferSize{ get; set; }
@@ -34,7 +34,7 @@ namespace DigitsSummer.Benchmarks
         {
             //_fileMap = GlobalSetupHelper.GenerateDataFilesIfDoesNotExist("1M", "10M", "100M");
             Stopwatch sw = Stopwatch.StartNew();
-            _fileMap = GlobalSetupHelper.GenerateDataFilesIfDoesNotExist(Data);
+            _fileMap = GlobalSetupHelper.GenerateDataFilesIfDoesNotExist(_data);
             sw.Stop();
             Console.WriteLine($"Data file generated on {sw.Elapsed}");
         }
@@ -51,13 +51,13 @@ namespace DigitsSummer.Benchmarks
         //public ulong SumFromFileDataFlowV2() => SumFromFileDataFlow.SumV6FromFile(_fileMap[Data]);
 
         //[Benchmark]
-        public ulong SumFromFileDataFlowVx2() => SumFromFileDataFlow.SumVx2FromFile(_fileMap[Data], BufferSize);
+        public ulong SumFromFileDataFlowVx2() => SumFromFileDataFlow.SumVx2FromFile(_fileMap[_data], BufferSize);
 
         [Benchmark]
-        public ulong SumFromFileDataFlowVx3() => SumFromFileDataFlow.SumVx3FromFile(_fileMap[Data], BufferSize);
+        public ulong SumFromFileDataFlowVx3() => SumFromFileDataFlow.SumVx3FromFile(_fileMap[_data], BufferSize);
 
         [Benchmark]
-        public ulong SumFromFileDataFlowVx4() => SumFromFileDataFlow.SumVx4FromFile(_fileMap[Data], BufferSize);
+        public ulong SumFromFileDataFlowVx4() => SumFromFileDataFlow.SumVx4FromFile(_fileMap[_data], BufferSize);
 
     }
 }

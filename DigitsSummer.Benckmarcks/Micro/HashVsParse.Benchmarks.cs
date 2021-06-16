@@ -4,8 +4,8 @@ using BenchmarkDotNet.Order;
 
 namespace DigitsSummer.Benchmarks.Micro
 {
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(NumeralSystem.Arabic)]
+
+    [RankColumn()]
     [MemoryDiagnoser]
     [MedianColumn]
     //[SimpleJob(RunStrategy.Monitoring)]

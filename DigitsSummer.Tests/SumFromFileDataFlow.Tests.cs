@@ -5,61 +5,61 @@ namespace DigitsSummer.Tests
     public class SumFromFileDataFlowTests
     {
 
-        private const string SmallFile = "Small.txt";
-        private const ulong SmallFileSum = 45;
-        private const string File1K = "1K.txt";
+        private const string _smallFile = "Small.txt";
+        private const ulong _smallFileSum = 45;
+        private const string _file1K = "1K.txt";
         private static ulong _file1KSum;
 
         [SetUp]
         public static void Setup()
         {
-            Helper.GenerateDataFile(SmallFile, "000000000012345678900000000000");
-            _file1KSum = Helper.GenerateDataFile(File1K, 1_0000);
+            Helper.GenerateDataFile(_smallFile, "000000000012345678900000000000");
+            _file1KSum = Helper.GenerateDataFile(_file1K, 1_0000);
         }
 
 
         [Test]
         public static void SumV5FromFile_Test()
         {
-            var ret = SumFromFileDataFlow.SumV5FromFile(SmallFile,15);
-            Assert.AreEqual(SmallFileSum, ret);
-            ret = SumFromFileDataFlow.SumV5FromFile(File1K);
+            var ret = SumFromFileDataFlow.SumV5FromFile(_smallFile,15);
+            Assert.AreEqual(_smallFileSum, ret);
+            ret = SumFromFileDataFlow.SumV5FromFile(_file1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
         [Test]
         public static void SumFromFileV6_Tests()
         {
-            var ret = SumFromFileDataFlow.SumV6FromFile(SmallFile, 15);
-            Assert.AreEqual(SmallFileSum, ret);
-            ret = SumFromFileDataFlow.SumV5FromFile(File1K);
+            var ret = SumFromFileDataFlow.SumV6FromFile(_smallFile, 15);
+            Assert.AreEqual(_smallFileSum, ret);
+            ret = SumFromFileDataFlow.SumV5FromFile(_file1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
         [Test]
         public static void SumFromFileVx2_Tests()
         {
-            var ret = SumFromFileDataFlow.SumVx2FromFile(SmallFile, 15);
-            Assert.AreEqual(SmallFileSum, ret);
-            ret = SumFromFileDataFlow.SumVx2FromFile(File1K);
+            var ret = SumFromFileDataFlow.SumVx2FromFile(_smallFile, 15);
+            Assert.AreEqual(_smallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx2FromFile(_file1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
         [Test]
         public static void SumFromFileVx3_Tests()
         {
-            var ret = SumFromFileDataFlow.SumVx3FromFile(SmallFile, 15);
-            Assert.AreEqual(SmallFileSum, ret);
-            ret = SumFromFileDataFlow.SumVx3FromFile(File1K);
+            var ret = SumFromFileDataFlow.SumVx3FromFile(_smallFile, 15);
+            Assert.AreEqual(_smallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx3FromFile(_file1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
         [Test]
         public static void SumFromFileVx4_Tests()
         {
-            var ret = SumFromFileDataFlow.SumVx4FromFile(SmallFile, 15);
-            Assert.AreEqual(SmallFileSum, ret);
-            ret = SumFromFileDataFlow.SumVx4FromFile(File1K);
+            var ret = SumFromFileDataFlow.SumVx4FromFile(_smallFile, 15);
+            Assert.AreEqual(_smallFileSum, ret);
+            ret = SumFromFileDataFlow.SumVx4FromFile(_file1K);
             Assert.AreEqual(_file1KSum, ret);
         }
 
