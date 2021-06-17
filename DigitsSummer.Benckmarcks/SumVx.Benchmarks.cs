@@ -30,14 +30,17 @@ namespace DigitsSummer.Benchmarks
         //[Benchmark]
         //public ulong SumVx() => DigitsSummer.SumVx(Input);
 
-        //[Benchmark(Baseline = true)]
-        //public ulong SumVx2() => DigitsSummer.SumVx2(_data);
-        
-        [Benchmark(Baseline = true)]
+        [Benchmark]
+        public ulong SumVx2() => DigitsSummer.SumVx2(_data);
+
+        [Benchmark]
         public ulong SumVx22() => DigitsSummer.SumVx22(_data);
 
         [Benchmark]
         public ulong SumVx23() => DigitsSummer.SumVx23(_data);
+
+        [Benchmark(Baseline = true)]
+        public ulong SumVx24() => DigitsSummer.SumVx24(_data);
 
     }
 }

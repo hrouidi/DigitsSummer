@@ -245,7 +245,7 @@ namespace DigitsSummer
             }
 
             accVector = Avx2.Subtract(accVector, extra);
-            ulong ret = accVector.Sum(size);
+            ulong ret = accVector.SumVx();
             if (rem > 0)
                 ret += data[^rem..].Sum();
             return ret;
@@ -263,7 +263,9 @@ namespace DigitsSummer
             int rem = dataBytes.Length % size;
             int iterationCount = dataBytes.Length / size;
             uint allZero = 48 * (uint)iterationCount;
-            Vector256<uint> extra = Avx2.BroadcastScalarToVector256(&allZero);
+
+            Vector256<uint> extra = Vector256.Create(allZero);
+
 
             for (int index = 0; index <= lastIndex; index += size)
             {
@@ -276,7 +278,33 @@ namespace DigitsSummer
             }
 
             accVector = Avx2.Subtract(accVector, extra);
-            ulong ret = accVector.Sum(size);
+            ulong ret = accVector.Sum();
+            if (rem > 0)
+                ret += data[^rem..].Sum();
+            return ret;
+        }
+        
+        public static ulong SumVx24(in ReadOnlySpan<char> data)
+        {
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            int size = Vector256<uint>.Count;
+            
+            ReadOnlySpan<Vector128<ushort>> vectors = MemoryMarshal.Cast<char, Vector128<ushort>>(data);
+
+            int rem = data.Length % size;
+            int iterationCount = vectors.Length;
+            uint allZero = 48 * (uint)iterationCount;
+
+            Vector256<uint> extra = Vector256.Create(allZero);
+
+            for (int i = 0; i < vectors.Length; i++)
+            {
+                var tmp1 = Avx2.ConvertToVector256Int32(vectors[i]).AsUInt32();
+                accVector = Avx2.Add(accVector, tmp1);
+            }
+            
+            accVector = Avx2.Subtract(accVector, extra);
+            ulong ret = accVector.Sum();
             if (rem > 0)
                 ret += data[^rem..].Sum();
             return ret;

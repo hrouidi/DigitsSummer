@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -73,24 +74,14 @@ namespace DigitsSummer
             return ret;
         }
 
-        public static ulong SumVx(this Vector256<ulong> vector)
+        public static ulong SumVx(this in Vector256<ulong> vector)
         {
-            throw new NotImplementedException();
+            return Vector.Dot(vector.AsVector(), Vector<ulong>.One);
         }
-        public static ulong Sum(this Vector256<long> vector, int elementCount)
+        
+        public static ulong Sum(this in Vector256<uint> vector)
         {
-            long ret = 0;
-            for (int i = 0; i < elementCount; ++i)
-                ret += vector.GetElement(i);
-            return (ulong) ret;
-        }
-
-        public static ulong Sum(this Vector256<uint> vector, int elementCount)
-        {
-            long ret = 0;
-            for (int i = 0; i < elementCount; ++i)
-                ret += vector.GetElement(i);
-            return (ulong)ret;
+            return Vector.Dot(vector.AsVector(), Vector<uint>.One);
         }
 
         public static ulong Sum(this in  ReadOnlySpan<char> smallString)
