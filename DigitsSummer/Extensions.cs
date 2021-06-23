@@ -83,6 +83,10 @@ namespace DigitsSummer
         {
             return Vector.Dot(vector.AsVector(), Vector<uint>.One);
         }
+        public static ulong Sum(this in Vector<uint> vector)
+        {
+            return Vector.Dot(vector, Vector<uint>.One);
+        }
 
         public static ulong Sum(this in  ReadOnlySpan<char> smallString)
         {
@@ -92,6 +96,14 @@ namespace DigitsSummer
                 ret += _hash[ch];
             return ret;
 
+        }
+
+        public static ulong SumAsChar(this in ReadOnlySpan<char> smallString)
+        {
+            ulong ret = 0;
+            foreach (var unicode16Char in smallString)
+                ret += unicode16Char;
+            return ret;
         }
     }
 }

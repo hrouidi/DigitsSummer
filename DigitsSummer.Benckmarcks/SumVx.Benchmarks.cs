@@ -13,7 +13,7 @@ namespace DigitsSummer.Benchmarks
 
         //[Params("1M", "10M", "100M")]
 
-        [Params(300_000_000)]
+        [Params(1_000_000_000)]
         public int DataSize { get; set; }
 
         [GlobalSetup]
@@ -30,17 +30,26 @@ namespace DigitsSummer.Benchmarks
         //[Benchmark]
         //public ulong SumVx() => DigitsSummer.SumVx(Input);
 
-        [Benchmark]
-        public ulong SumVx2() => DigitsSummer.SumVx2(_data);
+        //[Benchmark]
+        //public ulong SumVx2() => DigitsSummer.SumVx2(_data);
 
-        [Benchmark]
-        public ulong SumVx22() => DigitsSummer.SumVx22(_data);
+        //[Benchmark]
+        //public ulong SumVx22() => DigitsSummer.SumVx22(_data);
 
         [Benchmark]
         public ulong SumVx23() => DigitsSummer.SumVx23(_data);
 
+        [Benchmark]
+        public ulong SumVx241() => DigitsSummer.SumVx241(_data);
+
+        [Benchmark]
+        public ulong SumVx25() => DigitsSummer.SumVx25(_data);
+
         [Benchmark(Baseline = true)]
-        public ulong SumVx24() => DigitsSummer.SumVx24(_data);
+        public ulong SumVx25_MemoryPool() => DigitsSummer.SumVx25_memoryPool(_data);
+
+        //[Benchmark]
+        public ulong SumVx25_MemoryPool_avx() => DigitsSummer.SumVx25_memoryPool_avx(_data);
 
     }
 }

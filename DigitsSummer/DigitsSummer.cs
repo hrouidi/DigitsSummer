@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -15,46 +16,46 @@ namespace DigitsSummer
     public static partial class DigitsSummer
     {
         private static readonly Dictionary<char, ulong> _hash = new()
-                                                               {
-                                                                         ['0'] = 0ul,
-                                                                         ['1'] = 1ul,
-                                                                         ['2'] = 2ul,
-                                                                         ['3'] = 3ul,
-                                                                         ['4'] = 4ul,
-                                                                         ['5'] = 5ul,
-                                                                         ['6'] = 6ul,
-                                                                         ['7'] = 7ul,
-                                                                         ['8'] = 8ul,
-                                                                         ['9'] = 9ul,
-                                                                     };
+        {
+            ['0'] = 0ul,
+            ['1'] = 1ul,
+            ['2'] = 2ul,
+            ['3'] = 3ul,
+            ['4'] = 4ul,
+            ['5'] = 5ul,
+            ['6'] = 6ul,
+            ['7'] = 7ul,
+            ['8'] = 8ul,
+            ['9'] = 9ul,
+        };
 
         private static readonly Dictionary<char, long> _hashInt64 = new()
-                                                                   {
-                                                                             ['0'] = 0L,
-                                                                             ['1'] = 1L,
-                                                                             ['2'] = 2L,
-                                                                             ['3'] = 3L,
-                                                                             ['4'] = 4L,
-                                                                             ['5'] = 5L,
-                                                                             ['6'] = 6L,
-                                                                             ['7'] = 7L,
-                                                                             ['8'] = 8L,
-                                                                             ['9'] = 9L,
-                                                                         };
+        {
+            ['0'] = 0L,
+            ['1'] = 1L,
+            ['2'] = 2L,
+            ['3'] = 3L,
+            ['4'] = 4L,
+            ['5'] = 5L,
+            ['6'] = 6L,
+            ['7'] = 7L,
+            ['8'] = 8L,
+            ['9'] = 9L,
+        };
 
         private static readonly Dictionary<char, byte> _hash8 = new()
-                                                               {
-                                                                         ['0'] = 0,
-                                                                         ['1'] = 1,
-                                                                         ['2'] = 2,
-                                                                         ['3'] = 3,
-                                                                         ['4'] = 4,
-                                                                         ['5'] = 5,
-                                                                         ['6'] = 6,
-                                                                         ['7'] = 7,
-                                                                         ['8'] = 8,
-                                                                         ['9'] = 9,
-                                                                     };
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['4'] = 4,
+            ['5'] = 5,
+            ['6'] = 6,
+            ['7'] = 7,
+            ['8'] = 8,
+            ['9'] = 9,
+        };
 
         public static ulong ByHash(in ReadOnlySpan<char> cha) => _hash[cha[0]];
 
@@ -168,7 +169,7 @@ namespace DigitsSummer
         {
             return (ulong)SumVx2A(data);
         }
-        
+
         public static unsafe long SumVx2A(in ReadOnlySpan<char> data)
         {
             long ret = 0;
@@ -283,71 +284,215 @@ namespace DigitsSummer
                 ret += data[^rem..].Sum();
             return ret;
         }
-        
+
         public static ulong SumVx24(in ReadOnlySpan<char> data)
         {
             Vector256<uint> accVector = Vector256<uint>.Zero;
             int size = Vector256<uint>.Count;
-            
+
             ReadOnlySpan<Vector128<ushort>> vectors = MemoryMarshal.Cast<char, Vector128<ushort>>(data);
 
             int rem = data.Length % size;
             int iterationCount = vectors.Length;
-            uint allZero = 48 * (uint)iterationCount;
+            uint zero = 48 * (uint)vectors.Length;
 
-            Vector256<uint> extra = Vector256.Create(allZero);
+            Vector256<uint> extra = Vector256.Create(zero);
 
             for (int i = 0; i < vectors.Length; i++)
             {
+                //Vector.
                 var tmp1 = Avx2.ConvertToVector256Int32(vectors[i]).AsUInt32();
                 accVector = Avx2.Add(accVector, tmp1);
             }
-            
+
             accVector = Avx2.Subtract(accVector, extra);
             ulong ret = accVector.Sum();
+
             if (rem > 0)
                 ret += data[^rem..].Sum();
             return ret;
         }
 
-        public static unsafe ulong SumVxAdaptative(in ReadOnlySpan<char> data)
+        public static ulong SumVx241(in ReadOnlySpan<char> data)
         {
-            byte m = byte.MaxValue ;
-            m = (byte) (m + 255);
-            Vector256<byte> max = Vector256<byte>.AllBitsSet;
-            Vector256<byte> max2= Vector256<byte>.AllBitsSet;
-            var tmp = Avx2.AddSaturate(max, max2);
             Vector256<uint> accVector = Vector256<uint>.Zero;
-            //int size8 = Vector256<byte>.Count;
-            int size16 = Vector256<ushort>.Count;
-            int size32 = Vector256<uint>.Count;
-            int size64 = Vector256<ulong>.Count;
+            ReadOnlySpan<Vector128<ushort>> vectors = MemoryMarshal.Cast<char, Vector128<ushort>>(data);
 
+            foreach (ref readonly var vector in vectors)
+            {
+                var tmp1 = Avx2.ConvertToVector256Int32(vector).AsUInt32();
+                accVector = Avx2.Add(accVector, tmp1);
+            }
 
-            ReadOnlySpan<ushort> dataBytes = MemoryMarshal.Cast<char, ushort>(data);
-
-            //int lastIndex = dataBytes.Length - size;
-            //int rem = dataBytes.Length % size;
-            //int iterationCount = dataBytes.Length / size;
-            //uint allZero = 48 * (uint)iterationCount;
-            //Vector256<uint> extra = Avx2.BroadcastScalarToVector256(&allZero);
-
-            //for (int index = 0; index <= lastIndex; index += size)
-            //{
-            //    ReadOnlySpan<ushort> current = dataBytes.Slice(index, size);
-            //    fixed (ushort* pStart = current)
-            //    {
-            //        Vector256<int> bytesVx = Avx2.ConvertToVector256Int32(pStart);
-            //        accVector = Avx2.Add(accVector, bytesVx.AsUInt32());
-            //    }
-            //}
-
-            //accVector = Avx2.Subtract(accVector, extra);
-            //ulong ret = accVector.Sum(size);
-            //if (rem > 0)
-            //    ret += data[^rem..].Sum();
-            //return ret;
-            return 0;
+            ulong ret = accVector.Sum();
+            // incomplete vector
+            int rem = data.Length % Vector256<uint>.Count;
+            if (rem > 0)
+                for (int i = rem; i < data.Length; ++i)
+                    ret += data[^i];
+            //remove unicode extra byte
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
         }
+
+        public static ulong SumVx2411(in ReadOnlySpan<char> data)
+        {
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            int size = Vector256<uint>.Count;
+
+            ReadOnlySpan<Vector128<ushort>> vectors = MemoryMarshal.Cast<char, Vector128<ushort>>(data);
+
+            foreach (var vector in vectors)
+            {
+                var tmp1 = Avx2.ConvertToVector256Int32(vector).AsUInt32();
+                accVector = Avx2.Add(accVector, tmp1);
+            }
+
+            ulong ret = accVector.Sum();
+
+            int rem = data.Length % size;
+            if (rem > 0)
+                for (int i = rem; i < data.Length; ++i)
+                    ret += data[^i];
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
+        }
+
+        public static ulong SumVx242(in ReadOnlySpan<char> data)
+        {
+            Vector<uint> accVector = Vector<uint>.Zero;
+
+            ReadOnlySpan<Vector<ushort>> vectors = MemoryMarshal.Cast<char, Vector<ushort>>(data);
+
+            foreach (var vector in vectors)
+            {
+                Vector.Widen(vector, out Vector<uint> left, out Vector<uint> right);
+                accVector += left + right;
+            }
+
+            ulong ret = accVector.Sum();
+
+            int rem = data.Length % Vector<uint>.Count;
+            if (rem > 0)
+                for (int i = rem; i < data.Length; ++i)
+                    ret += data[^i];
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
+        }
+
+        public static ulong SumVx25(in ReadOnlySpan<char> data)
+        {
+            ReadOnlySpan<Vector256<ushort>> vectors = MemoryMarshal.Cast<char, Vector256<ushort>>(data);
+            ushort maxSumUInt16 = ushort.MaxValue / (48 + 9);//1149
+            int blocksCount = vectors.Length / maxSumUInt16; //54
+            Span<Vector256<ushort>> shortAccumulators = new Vector256<ushort>[blocksCount + 1];
+
+            for (int blockIndex = 0; blockIndex < blocksCount; blockIndex++)
+            {
+                int startIndex = blockIndex * maxSumUInt16  ;
+                int endIndex = maxSumUInt16 * (blockIndex + 1);
+                Vector256<ushort> tmp = Vector256<ushort>.Zero;
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    tmp = Avx2.Add(tmp, vectors[i]);
+                }
+                shortAccumulators[blockIndex] = tmp;
+            }
+            //Last incomplete block
+            Vector256<ushort> last = Vector256<ushort>.Zero;
+            for (int i = blocksCount * maxSumUInt16 ; i < vectors.Length; i++)
+            {
+                last = Avx2.Add(last, vectors[i]);
+            }
+            shortAccumulators[^1] = last;
+
+            // sum accumulators
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            foreach (ref readonly Vector256<ushort> acc in shortAccumulators)
+            {
+                Vector.Widen(acc.AsVector(), out Vector<uint> left, out Vector<uint> right);
+                accVector = Avx2.Add(accVector, (left + right).AsVector256());
+            }
+
+            ulong ret = accVector.Sum();
+            //remaining elements
+            int rem = data.Length % Vector<ushort>.Count;
+            if (rem > 0)
+                for (int i = rem; i < data.Length; ++i)
+                    ret += data[^i];
+            // Remove Extra Unicode value
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
+        }
+
+        public static ulong SumVx25_memoryPool(in ReadOnlySpan<char> data)
+        {
+            ReadOnlySpan<Vector256<ushort>> vectors = MemoryMarshal.Cast<char, Vector256<ushort>>(data);
+            ushort maxSumUInt16 = ushort.MaxValue / (48 + 9);//1149
+            int blocksCount = vectors.Length / maxSumUInt16; //54
+
+            IMemoryOwner<Vector256<ushort>> lease = MemoryPool<Vector256<ushort>>.Shared.Rent(blocksCount + 1);
+            Span<Vector256<ushort>> shortAccumulators = lease.Memory.Span;
+            for (int blockIndex = 0; blockIndex < blocksCount; blockIndex++)
+            {
+                int startIndex = blockIndex * maxSumUInt16;
+                int endIndex = maxSumUInt16 * (blockIndex + 1);
+                Vector256<ushort> tmp = Vector256<ushort>.Zero;
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    tmp = Avx2.Add(tmp, vectors[i]);
+                }
+                shortAccumulators[blockIndex] = tmp;
+            }
+            //Last incomplete block
+            Vector256<ushort> last = Vector256<ushort>.Zero;
+            for (int i = blocksCount * maxSumUInt16; i < vectors.Length; i++)
+            {
+                last = Avx2.Add(last, vectors[i]);
+            }
+            shortAccumulators[^1] = last;
+
+            // sum accumulators
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            foreach (ref readonly Vector256<ushort> acc in shortAccumulators)
+            {
+                Vector.Widen(acc.AsVector(), out Vector<uint> left, out Vector<uint> right);
+                accVector = Avx2.Add(accVector, (left + right).AsVector256());
+            }
+
+            lease.Dispose();
+            ulong ret = accVector.Sum();
+            //remaining elements
+            int rem = data.Length % Vector<ushort>.Count;
+            if (rem > 0)
+                ret += data[rem..].SumAsChar();
+
+            // Remove Extra Unicode value
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
+        }
+        
+    }
+
+    public unsafe struct ShortBlock
+    {
+        private fixed ushort _vectors[1149 * 16];
+
+        private ReadOnlySpan<ushort> _span
+        {
+            get
+            {
+                fixed (ushort* ptr = _vectors)
+                    return new ReadOnlySpan<ushort>(ptr, 1149 * 16);
+                //return new ReadOnlySpan<ushort>(MemoryMarshal.GetReference(_vectors);
+            }
+        }
+
+        public Vector<ushort> this[int index] => new(_span.Slice(index * 1149, 16));
     }
 }
