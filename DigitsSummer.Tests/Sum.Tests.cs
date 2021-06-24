@@ -7,11 +7,11 @@ namespace DigitsSummer.Tests
     {
 
         [Test]
-        [TestCase("0000001",1ul)]
+        [TestCase("0000001", 1ul)]
         [TestCase("123456789", 45ul)]
         [TestCase("00000000000123456789", 45ul)]
         [TestCase("0000000000012345678900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 45ul)]
-        public static void SumVx_Tests(string data,ulong expected )
+        public static void SumVx_Tests(string data, ulong expected)
         {
             Assert.AreEqual(expected, DigitsSummer.Sum(data));
             Assert.AreEqual(expected, DigitsSummer.SumHash(data));
@@ -27,19 +27,23 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(expected, DigitsSummer.SumVx22(data));
             Assert.AreEqual(expected, DigitsSummer.SumVx23(data));
             Assert.AreEqual(expected, DigitsSummer.SumVx24(data));
-           
+
         }
 
-        [Test,Explicit]
+        [Test, Explicit]
         public static void Debug()
         {
-        
-            //DigitsSummer.SumVx24_Max("123456789012345");
-            
             var input = GlobalSetupHelper.GenerateDataAsString(1_000_000);
-            ulong actual =DigitsSummer.SumVx25_memoryPool_avx(input);
-            ulong expected =DigitsSummer.SumVx24(input);
+            ulong actual = DigitsSummer.SumVx25_memoryPool_unrolled(input);
+            ulong expected = DigitsSummer.SumVx24(input);
             Assert.AreEqual(actual, expected);
+        }
+
+        [Test, Explicit]
+        public static void Profile()
+        {
+            var input = GlobalSetupHelper.GenerateDataAsString(1_000_000);
+            ulong actual = DigitsSummer.SumVx25_memoryPool(input);
         }
     }
 }

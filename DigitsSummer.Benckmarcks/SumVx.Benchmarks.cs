@@ -36,20 +36,18 @@ namespace DigitsSummer.Benchmarks
         //[Benchmark]
         //public ulong SumVx22() => DigitsSummer.SumVx22(_data);
 
-        [Benchmark]
+        //[Benchmark]
         public ulong SumVx23() => DigitsSummer.SumVx23(_data);
 
-        [Benchmark]
+        //[Benchmark]
         public ulong SumVx241() => DigitsSummer.SumVx241(_data);
-
-        [Benchmark]
-        public ulong SumVx25() => DigitsSummer.SumVx25(_data);
+        
 
         [Benchmark(Baseline = true)]
         public ulong SumVx25_MemoryPool() => DigitsSummer.SumVx25_memoryPool(_data);
 
-        //[Benchmark]
-        public ulong SumVx25_MemoryPool_avx() => DigitsSummer.SumVx25_memoryPool_avx(_data);
+        [Benchmark]
+        public ulong SumVx25_memoryPool_unrolled() => DigitsSummer.SumVx25_memoryPool_unrolled(_data);
 
     }
 }

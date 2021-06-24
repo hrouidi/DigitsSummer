@@ -339,7 +339,6 @@ namespace DigitsSummer
         public static ulong SumVx2411(in ReadOnlySpan<char> data)
         {
             Vector256<uint> accVector = Vector256<uint>.Zero;
-            int size = Vector256<uint>.Count;
 
             ReadOnlySpan<Vector128<ushort>> vectors = MemoryMarshal.Cast<char, Vector128<ushort>>(data);
 
@@ -351,10 +350,11 @@ namespace DigitsSummer
 
             ulong ret = accVector.Sum();
 
-            int rem = data.Length % size;
+            //remaining elements
+            int rem = data.Length % Vector<ushort>.Count;
             if (rem > 0)
-                for (int i = rem; i < data.Length; ++i)
-                    ret += data[^i];
+                ret += data[rem..].SumAsChar();
+            // Remove Extra Unicode value
             ulong extra = 48 * (ulong)data.Length;
             ret -= extra;
             return ret;
@@ -436,7 +436,7 @@ namespace DigitsSummer
             int blocksCount = vectors.Length / maxSumUInt16; //54
 
             IMemoryOwner<Vector256<ushort>> lease = MemoryPool<Vector256<ushort>>.Shared.Rent(blocksCount + 1);
-            Span<Vector256<ushort>> shortAccumulators = lease.Memory.Span;
+            Span<Vector256<ushort>> shortAccumulators = lease.Memory.Span[..(blocksCount + 1)];
             for (int blockIndex = 0; blockIndex < blocksCount; blockIndex++)
             {
                 int startIndex = blockIndex * maxSumUInt16;
@@ -476,7 +476,160 @@ namespace DigitsSummer
             ret -= extra;
             return ret;
         }
-        
+
+        public static ulong SumVx25_memoryPool_unrolled(in ReadOnlySpan<char> data)
+        {
+            ReadOnlySpan<Vector256<ushort>> vectors = MemoryMarshal.Cast<char, Vector256<ushort>>(data);
+            ushort maxSumUInt16 = ushort.MaxValue / (48 + 9);//1149
+            int blocksCount = vectors.Length / maxSumUInt16; //54
+
+            IMemoryOwner<Vector256<ushort>> lease = MemoryPool<Vector256<ushort>>.Shared.Rent(blocksCount + 1);
+            Span<Vector256<ushort>> shortAccumulators = lease.Memory.Span[..(blocksCount + 1)];
+            for (int blockIndex = 0; blockIndex < blocksCount; blockIndex++)
+            {
+                int startIndex = blockIndex * maxSumUInt16;
+                int endIndex = maxSumUInt16 * (blockIndex + 1) ;
+                Vector256<ushort> tmp = Vector256<ushort>.Zero;
+                for (int i = startIndex; i < endIndex-4; i+=4)
+                {
+                    tmp = Avx2.Add(tmp, vectors[i]);
+                    tmp = Avx2.Add(tmp, vectors[i + 1]);
+                    tmp = Avx2.Add(tmp, vectors[i + 2]);
+                    tmp = Avx2.Add(tmp, vectors[i + 3]);
+                }
+                tmp = Avx2.Add(tmp, vectors[endIndex-1]);
+                shortAccumulators[blockIndex] = tmp;
+            }
+            //Last incomplete block
+            Vector256<ushort> last = Vector256<ushort>.Zero;
+            for (int i = blocksCount * maxSumUInt16; i < vectors.Length; i++)
+            {
+                last = Avx2.Add(last, vectors[i]);
+            }
+            shortAccumulators[^1] = last;
+
+            // sum accumulators
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            foreach (ref readonly Vector256<ushort> acc in shortAccumulators)
+            {
+                Vector.Widen(acc.AsVector(), out Vector<uint> left, out Vector<uint> right);
+                accVector = Avx2.Add(accVector, (left + right).AsVector256());
+            }
+
+            lease.Dispose();
+            ulong ret = accVector.Sum();
+            //remaining elements
+            int rem = data.Length % Vector<ushort>.Count;
+            if (rem > 0)
+                ret += data[rem..].SumAsChar();
+
+            // Remove Extra Unicode value
+            ulong extra = 48 * (ulong)data.Length;
+            ret -= extra;
+            return ret;
+        }
+
+
+        public static ulong SumVx26(in ReadOnlySpan<char> data)
+        {
+            ReadOnlySpan<Vector256<ushort>> vectors = MemoryMarshal.Cast<char, Vector256<ushort>>(data);
+            ushort maxSumUInt16 = ushort.MaxValue / 48;//1365
+            int blocksCount = vectors.Length / maxSumUInt16; //45
+            Vector256<ushort> extra = Vector256.Create((ushort)('0' * maxSumUInt16));
+            IMemoryOwner<Vector256<ushort>> lease = MemoryPool<Vector256<ushort>>.Shared.Rent(blocksCount + 1);
+            Span<Vector256<ushort>> shortAccumulators = lease.Memory.Span[..(blocksCount + 1)];
+            for (int blockIndex = 0; blockIndex < blocksCount; blockIndex++)
+            {
+                int startIndex = blockIndex * maxSumUInt16;
+                int endIndex = maxSumUInt16 * (blockIndex + 1);
+                Vector256<ushort> tmp = Vector256<ushort>.Zero;
+                
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    tmp = Avx2.Add(tmp, vectors[i]);
+                }
+
+                shortAccumulators[blockIndex] = Avx2.Subtract(tmp , extra);
+            }
+            //Last incomplete block
+            Vector256<ushort> last = Vector256<ushort>.Zero;
+            var lastBlock = vectors[(blocksCount * maxSumUInt16)..];
+            foreach (ref readonly var current in lastBlock)
+            {
+                last = Avx2.Add(last, current);
+            }
+            shortAccumulators[^1] = Avx2.Subtract(last, Vector256.Create((ushort)('0' * lastBlock.Length)));
+
+            // sum accumulators
+            Vector256<uint> accVector = Vector256<uint>.Zero;
+            foreach (ref readonly Vector256<ushort> acc in shortAccumulators)
+            {
+                Vector.Widen(acc.AsVector(), out Vector<uint> left, out Vector<uint> right);
+                accVector = Avx2.Add(accVector, (left + right).AsVector256());
+            }
+
+            lease.Dispose();
+            ulong ret = accVector.Sum();
+            //remaining elements
+            int rem = data.Length % Vector<ushort>.Count;
+            if (rem > 0)
+                ret += data[rem..].SumAsChar();
+
+            // Remove Extra Unicode value
+            //ulong extra = 48 * (ulong)data.Length;
+            //ret -= extra;
+            return ret;
+        }
+
+        //public static ulong SumVx27(in ReadOnlySpan<char> data)
+        //{
+        //    ReadOnlySpan<Vector256<byte>> vectors = MemoryMarshal.Cast<char, Vector256<byte>>(data);
+        //    byte maxSumUsingByteVector = byte.MaxValue / (48 + 9);//1149
+        //    int byteVectorsCount = vectors.Length / maxSumUsingByteVector/2; //54
+
+        //    IMemoryOwner<Vector256<byte>> lease = MemoryPool<Vector256<byte>>.Shared.Rent(byteVectorsCount + 1);
+        //    Span<Vector256<byte>> byteAccumulators = lease.Memory.Span[..(byteVectorsCount + 1)];
+        //    for (int blockIndex = 0; blockIndex < byteVectorsCount; blockIndex++)
+        //    {
+        //        int startIndex = blockIndex * maxSumUsingByteVector;
+        //        int endIndex = maxSumUsingByteVector * (blockIndex + 1);
+        //        Vector256<byte> tmp = Vector256<byte>.Zero;
+        //        for (int i = startIndex; i < endIndex; i=+2)
+        //        {
+        //            var adj = Avx2.HorizontalAdd(vectors[i], vectors[i + 1]);
+        //            tmp = Avx2.Add(tmp, vectors[i]);
+        //        }
+        //        byteAccumulators[blockIndex] = tmp;
+        //    }
+        //    //Last incomplete block
+        //    Vector256<byte> last = Vector256<byte>.Zero;
+        //    for (int i = byteVectorsCount * maxSumUsingByteVector; i < vectors.Length; i++)
+        //    {
+        //        last = Avx2.Add(last, vectors[i]);
+        //    }
+        //    byteAccumulators[^1] = last;
+
+        //    // sum accumulators
+        //    Vector256<ushort> accVector = Vector256<ushort>.Zero;
+        //    foreach (ref readonly Vector256<byte> acc in byteAccumulators)
+        //    {
+        //        Vector.Widen(acc.AsVector(), out Vector<ushort> left, out Vector<ushort> right);
+        //        accVector = Avx2.Add(accVector, (left + right).AsVector256());
+        //    }
+
+        //    lease.Dispose();
+        //    ulong ret = 0;// accVector.Sum();
+        //    //remaining elements
+        //    int rem = data.Length % Vector<ushort>.Count;
+        //    if (rem > 0)
+        //        ret += data[rem..].SumAsChar();
+
+        //    // Remove Extra Unicode value
+        //    ulong extra = 48 * (ulong)data.Length;
+        //    ret -= extra;
+        //    return ret;
+        //}
+
     }
 
     public unsafe struct ShortBlock
