@@ -1,3 +1,6 @@
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using DigitsSummer.Benchmarks;
 using NUnit.Framework;
 
@@ -44,6 +47,17 @@ namespace DigitsSummer.Tests
         {
             var input = GlobalSetupHelper.GenerateDataAsString(1_000_000);
             ulong actual = DigitsSummer.SumVx25_memoryPool(input);
+        }
+
+        [Test]
+        public void MutatingStringTest()
+        {
+            const string source = "0123456789";
+            ref var tmp = ref MemoryMarshal.GetReference(source.AsSpan());
+            Span<char> mutated = MemoryMarshal.CreateSpan(ref tmp, source.Length);
+            mutated.Fill('m');
+
+            Assert.AreEqual("mmmmmmmmmm", mutated.ToString());
         }
     }
 }
