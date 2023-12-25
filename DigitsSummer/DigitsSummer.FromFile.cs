@@ -14,12 +14,6 @@ namespace DigitsSummer
             return Sum(text);
         }
 
-        public static ulong SumV2FromFile(string fileName)
-        {
-            string text = File.ReadAllText(fileName);
-            return SumV2(text);
-        }
-
         public static ulong SumV3FromFile(string fileName)
         {
             string text = File.ReadAllText(fileName);
@@ -58,7 +52,7 @@ namespace DigitsSummer
             {
                 var cpt = fsSource.Read(buffer);
                 current = cpt < buffer.Length ? buffer[..cpt] : buffer;
-                ret +=  SumVx2(current);
+                ret += SumVx2(current);
             }
             return ret;
         }

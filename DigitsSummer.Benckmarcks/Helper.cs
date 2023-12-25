@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace DigitsSummer.Benchmarks
     public static class GlobalSetupHelper
     {
         private const string _dataDirectory = @"D:\WorkSpace\Perso\DigitsSummer\Data";
+
         public static Dictionary<string, string> GenerateDataFilesIfDoesNotExist(params string[] @params)
         {
             Dictionary<string, string> ret = new Dictionary<string, string>();
@@ -39,50 +41,69 @@ namespace DigitsSummer.Benchmarks
                         throw new NotImplementedException();
                 }
             }
+
+            return ret;
+
+            static void GenerateDataFileIfDoesNotExist(string fileName, int max)
+            {
+                var path = Path.Combine(_dataDirectory, fileName);
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"Generating data file @ : {path}");
+                    using TextWriter writeFile = new StreamWriter(path);
+                    foreach (var text in GenerateData(max))
+                        writeFile.Write(text);
+                    writeFile.Flush();
+                    writeFile.Close();
+                }
+
+                return;
+
+                static IEnumerable<string> GenerateData(int max)
+                {
+                    const int bufferSize = 1024 * 16;
+                    var sb = new StringBuilder(max);
+                    for (int index = 0; index < max; ++index)
+                    {
+                        sb.Append(Random.Shared.Next(0, 10));
+                        if (index % bufferSize == 0)
+                        {
+                            var ret = sb.ToString();
+                            sb.Clear();
+                            yield return ret;
+                        }
+                    }
+
+                    if (sb.Length > 0)
+                        yield return sb.ToString();
+
+                }
+            }
+        }
+
+        public static string GenerateDataAsString(int maxDigits)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+
+            var sb = new StringBuilder(maxDigits);
+            for (int index = 0; index < maxDigits; ++index)
+                sb.Append(Random.Shared.Next(0, 10));
+            var ret = sb.ToString();
+            sw.Stop();
+            Console.WriteLine($"### Data file generated on {sw.Elapsed} ###");
             return ret;
         }
 
-        private static void GenerateDataFileIfDoesNotExist(string fileName, int max)
+        public static string GenerateOnesAsString(int maxDigits)
         {
-            var path = Path.Combine(_dataDirectory, fileName);
-            if (!File.Exists(path))
-            {
-                Console.WriteLine($"Generating data file @ : {path}");
-                using TextWriter writeFile = new StreamWriter(path);
-                foreach (var text in GenerateData(max))
-                    writeFile.Write(text);
-                writeFile.Flush();
-                writeFile.Close();
-            }
-        }
-
-        public static IEnumerable<string> GenerateData(int max)
-        {
-            const int bufferSize = 1024 * 16;
-            Random random = new Random();
-            var sb = new StringBuilder(max);
-            for (int index = 0; index < max; ++index)
-            {
-                sb.Append(random.Next(0, 10));
-                if (index % bufferSize == 0)
-                {
-                    var ret = sb.ToString();
-                    sb.Clear();
-                    yield return ret;
-                }
-            }
-            if (sb.Length > 0)
-                yield return sb.ToString();
-
-        }
-
-        public static string GenerateDataAsString(int max)
-        {
-            Random random = new ();
-            var sb = new StringBuilder(max);
-            for (int index = 0; index < max; ++index)
-                sb.Append(random.Next(0, 10));
-            return sb.ToString();
+            Stopwatch sw = Stopwatch.StartNew();
+            var sb = new StringBuilder(maxDigits);
+            for (int index = 0; index < maxDigits; ++index)
+                sb.Append("1");
+            var ret = sb.ToString();
+            sw.Stop();
+            Console.WriteLine($"### Data file generated on {sw.Elapsed} ###");
+            return ret;
         }
     }
 }

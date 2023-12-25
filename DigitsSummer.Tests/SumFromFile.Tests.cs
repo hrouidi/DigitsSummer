@@ -27,14 +27,6 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(_file1KSum, ret);
         }
 
-        [Test]
-        public static void SumFromFileV2_Tests()
-        {
-            var ret = DigitsSummer.SumV2FromFile(_smallFile);
-            Assert.AreEqual(_smallFileSum, ret);
-            ret = DigitsSummer.SumV2FromFile(_file1K);
-            Assert.AreEqual(_file1KSum, ret);
-        }
 
         [Test]
         public static void SumFromFileV3_Tests()

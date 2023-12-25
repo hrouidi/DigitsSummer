@@ -5,50 +5,56 @@ using Perfolizer.Mathematics.OutlierDetection;
 namespace DigitsSummer.Benchmarks
 {
     [Outliers(OutlierMode.DontRemove)]
+    [RankColumn]
     [MemoryDiagnoser]
-    //[SimpleJob(RunStrategy.Monitoring)]
+    [MedianColumn]
     public class SumVxBenchmarks
     {
         private string _data;
 
-        //[Params("1M", "10M", "100M")]
-
-        [Params(1_000_000_000)]
-        public int DataSize { get; set; }
 
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _data = GlobalSetupHelper.GenerateDataAsString(DataSize);
+            _data = GlobalSetupHelper.GenerateDataAsString(1_000_000_000);
         }
 
 
-        //[Benchmark(Baseline = true)]
-        //public ulong SumV4() => DigitsSummer.SumV4(Input);
-
-
-        //[Benchmark]
-        //public ulong SumVx() => DigitsSummer.SumVx(Input);
-
-        //[Benchmark]
-        //public ulong SumVx2() => DigitsSummer.SumVx2(_data);
-
-
-        //[Benchmark]
-        public ulong SumVx23() => DigitsSummer.SumVx23(_data);
-
-        //[Benchmark]
-        public ulong SumVx241() => DigitsSummer.SumVx241(_data);
-        
-
         [Benchmark(Baseline = true)]
-        public ulong SumVx25_MemoryPool() => DigitsSummer.SumVx25_memoryPool(_data);
-
-        //[Benchmark]
-        public ulong SumVx25_memoryPool_unrolled() => DigitsSummer.SumVx25_memoryPool_unrolled(_data);
+        public ulong SumParallel() => DigitsSummer.SumParallel(_data);
 
         [Benchmark]
-        public ulong SumVx26() => DigitsSummer.SumVx26(_data);
+        public ulong SumVx24Parallel() => DigitsSummer.SumVx24Parallel(_data);
+
+        [Benchmark]
+        public ulong SumVx251Parallel() => DigitsSummer.SumVx251Parallel(_data);
+
+
+        //[Benchmark]
+        //public ulong SumVx240() => DigitsSummer.SumVx240(_data);
+
+        //[Benchmark]
+        //public ulong SumVx251() => DigitsSummer.SumVx251(_data);
+
+        //[Benchmark]
+        //public long SumSseInner() => DigitsSummer.SumSseInner(_data);
+
+
+        ////[Benchmark]
+        //public ulong SumVx23() => DigitsSummer.SumVx23(_data);
+
+        ////[Benchmark]
+        //public ulong SumVx241() => DigitsSummer.SumVx241(_data);
+
+
+        //[Benchmark]
+        //public ulong SumVx25_MemoryPool() => DigitsSummer.SumVx25_memoryPool(_data);
+
+        ////[Benchmark]
+        //public ulong SumVx25_memoryPool_unrolled() => DigitsSummer.SumVx25_memoryPool_unrolled(_data);
+
+        //[Benchmark]
+        //public ulong SumVx26() => DigitsSummer.SumVx26(_data);
 
     }
 }
