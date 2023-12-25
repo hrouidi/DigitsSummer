@@ -1,5 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Reports;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace DigitsSummer.Benchmarks
@@ -8,8 +11,17 @@ namespace DigitsSummer.Benchmarks
     [RankColumn]
     [MemoryDiagnoser]
     [MedianColumn]
+    [Config(typeof(Config))]
     public class SumVxBenchmarks
     {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
+            }
+        }
+
         private string _data;
 
 
@@ -19,8 +31,14 @@ namespace DigitsSummer.Benchmarks
             _data = GlobalSetupHelper.GenerateDataAsString(1_000_000_000);
         }
 
-
         [Benchmark(Baseline = true)]
+        public ulong Sum() => DigitsSummer.SumChar(_data);
+
+        [Benchmark]
+        public ulong SumVx251() => DigitsSummer.SumVx251(_data);
+
+
+        [Benchmark]
         public ulong SumParallel() => DigitsSummer.SumParallel(_data);
 
         [Benchmark]
@@ -32,9 +50,7 @@ namespace DigitsSummer.Benchmarks
 
         //[Benchmark]
         //public ulong SumVx240() => DigitsSummer.SumVx240(_data);
-
-        //[Benchmark]
-        //public ulong SumVx251() => DigitsSummer.SumVx251(_data);
+        
 
         //[Benchmark]
         //public long SumSseInner() => DigitsSummer.SumSseInner(_data);
@@ -45,16 +61,6 @@ namespace DigitsSummer.Benchmarks
 
         ////[Benchmark]
         //public ulong SumVx241() => DigitsSummer.SumVx241(_data);
-
-
-        //[Benchmark]
-        //public ulong SumVx25_MemoryPool() => DigitsSummer.SumVx25_memoryPool(_data);
-
-        ////[Benchmark]
-        //public ulong SumVx25_memoryPool_unrolled() => DigitsSummer.SumVx25_memoryPool_unrolled(_data);
-
-        //[Benchmark]
-        //public ulong SumVx26() => DigitsSummer.SumVx26(_data);
 
     }
 }

@@ -91,20 +91,20 @@ namespace DigitsSummer.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong SumChar(this in ReadOnlySpan<char> smallString)
+        public static ulong SumChar(this in ReadOnlySpan<char> data)
         {
             ulong ret = 0;
-            foreach (char unicode16Char in smallString)
+            foreach (char unicode16Char in data)
                 ret += unicode16Char;
 
-            return ret - '0' * (ulong)smallString.Length;
+            return ret - '0' * (ulong)data.Length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong SumAsChar(this in ReadOnlySpan<char> smallString)
+        public static ulong SumAsChar(this in ReadOnlySpan<char> data)
         {
             ulong ret = 0;
-            foreach (char unicode16Char in smallString)
+            foreach (char unicode16Char in data)
                 ret += unicode16Char;
             return ret;
         }
