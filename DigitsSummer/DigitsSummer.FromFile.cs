@@ -1,13 +1,10 @@
 using System;
-using System.Buffers.Text;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace DigitsSummer
 {
     public static partial class DigitsSummer
     {
-
         public static ulong SumFromFile(string fileName)
         {
             string text = File.ReadAllText(fileName);

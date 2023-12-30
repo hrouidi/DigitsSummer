@@ -345,6 +345,42 @@ namespace DigitsSummer
                     saturatedLowAcc += low;
                     saturatedHighAcc += high;
                 }
+                
+                (Vector256<ulong> low11, Vector256<ulong> high11) = Vector256.Widen(saturatedLowAcc);
+                finalAcc += low11 + high11;
+                (Vector256<ulong> low12, Vector256<ulong> high12) = Vector256.Widen(saturatedHighAcc);
+                finalAcc += low12 + high12;
+            }
+            ulong ret = Vector256.Sum(finalAcc);
+            ret += VxHelper.SumRemainder(data);// Remaining
+            return ret - '0' * (ulong)data.Length;
+        }
+
+        public static ulong SumVx252(this in ReadOnlySpan<char> data)
+        {
+            const int MaxSumUInt16 = 1149;//ushort.MaxValue / (48 + 9);
+            const int MaxSumUInt32 = 65_579; //uint.MaxValue / (48 + 9) /maxSumUInt16;
+            const int OuterPage = MaxSumUInt16 * MaxSumUInt32; // 75 350 271
+
+            ReadOnlySpan<Vector256<ushort>> vectors = MemoryMarshal.Cast<char, Vector256<ushort>>(data);
+            Vector256<ulong> finalAcc = Vector256<ulong>.Zero;
+            for (int longIndex = 0; longIndex < vectors.Length; longIndex = +OuterPage)
+            {
+                Vector256<uint> saturatedLowAcc = Vector256<uint>.Zero;
+                Vector256<uint> saturatedHighAcc = Vector256<uint>.Zero;
+                for (int index = 0; index < OuterPage && index + longIndex < vectors.Length; index += MaxSumUInt16)
+                {
+                    Vector256<ushort> saturatedShortAcc = Vector256<ushort>.Zero;
+                    for (int shortIndex = 0; shortIndex < MaxSumUInt16 && shortIndex + index + longIndex < vectors.Length; shortIndex++)
+                        saturatedShortAcc += vectors[shortIndex + index + longIndex];
+
+                    var tmp = Avx2.AddSaturate(saturatedShortAcc, saturatedShortAcc);
+                    
+                    (Vector256<uint> low, Vector256<uint> high) = Vector256.Widen(saturatedShortAcc);
+                    saturatedLowAcc += low;
+                    saturatedHighAcc += high;
+                }
+
                 (Vector256<ulong> low11, Vector256<ulong> high11) = Vector256.Widen(saturatedLowAcc);
                 finalAcc += low11 + high11;
                 (Vector256<ulong> low12, Vector256<ulong> high12) = Vector256.Widen(saturatedHighAcc);

@@ -1,5 +1,9 @@
 using System;
+using System.Buffers;
+using System.Buffers.Text;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
+using System.Security.Cryptography;
 using DigitsSummer.Benchmarks;
 using NUnit.Framework;
 
@@ -43,6 +47,9 @@ namespace DigitsSummer.Tests
             //var input = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
             //var input = GlobalSetupHelper.GenerateDataAsString(20_000);
             var input = GlobalSetupHelper.GenerateOnesAsString(24_000_000);
+            var tmp2 = Random.Shared.GetItems<char>("0123456789", 24_000_000);
+            var tmp3 = ArrayPool<char>.Shared.Rent(24_000_000);
+            Random.Shared.GetItems<char>("0123456789", tmp3);
             ulong expected = DigitsSummer.SumChar(input);
             ulong actual = DigitsSummer.SumVx251(input);
             Assert.AreEqual(expected, actual);
@@ -82,7 +89,11 @@ namespace DigitsSummer.Tests
         [Test, Explicit]
         public static void Profile()
         {
+            bool sse = Sse42.IsSupported;
+            
+
             var ret = DigitsSummer.SumVx250(_input);
         }
     }
+
 }

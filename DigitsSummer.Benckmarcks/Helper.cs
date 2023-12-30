@@ -83,26 +83,22 @@ namespace DigitsSummer.Benchmarks
 
         public static string GenerateDataAsString(int maxDigits)
         {
-            Stopwatch sw = Stopwatch.StartNew();
-
             var sb = new StringBuilder(maxDigits);
             for (int index = 0; index < maxDigits; ++index)
                 sb.Append(Random.Shared.Next(0, 10));
             var ret = sb.ToString();
-            sw.Stop();
-            Console.WriteLine($"### Data file generated on {sw.Elapsed} ###");
+
             return ret;
         }
 
         public static string GenerateOnesAsString(int maxDigits)
         {
-            Stopwatch sw = Stopwatch.StartNew();
+
             var sb = new StringBuilder(maxDigits);
             for (int index = 0; index < maxDigits; ++index)
                 sb.Append("1");
             var ret = sb.ToString();
-            sw.Stop();
-            Console.WriteLine($"### Data file generated on {sw.Elapsed} ###");
+
             return ret;
         }
     }

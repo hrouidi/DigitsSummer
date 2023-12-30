@@ -1,8 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Reports;
+﻿using BenchmarkDotNet.Attributes;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace DigitsSummer.Benchmarks
@@ -14,13 +10,6 @@ namespace DigitsSummer.Benchmarks
     [Config(typeof(Config))]
     public class SumVxBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
-            }
-        }
 
         private string _data;
 
