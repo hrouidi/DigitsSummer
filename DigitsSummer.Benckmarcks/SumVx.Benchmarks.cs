@@ -3,7 +3,7 @@ using Perfolizer.Mathematics.OutlierDetection;
 
 namespace DigitsSummer.Benchmarks
 {
-    [Outliers(OutlierMode.DontRemove)]
+    //[Outliers(OutlierMode.DontRemove)]
     [RankColumn]
     [MemoryDiagnoser]
     [MedianColumn]
@@ -17,7 +17,7 @@ namespace DigitsSummer.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _data = GlobalSetupHelper.GenerateDataAsString(1_000_000_000);
+            _data = GlobalSetupHelper.GenerateDataAsString(1_000_000);
         }
 
         [Benchmark(Baseline = true)]
@@ -26,15 +26,18 @@ namespace DigitsSummer.Benchmarks
         [Benchmark]
         public ulong SumVx251() => DigitsSummer.SumVx251(_data);
 
-
         [Benchmark]
-        public ulong SumParallel() => DigitsSummer.SumParallel(_data);
+        public ulong SumVx252() => DigitsSummer.SumVx252(_data);
 
-        [Benchmark]
-        public ulong SumVx24Parallel() => DigitsSummer.SumVx24Parallel(_data);
 
-        [Benchmark]
-        public ulong SumVx251Parallel() => DigitsSummer.SumVx251Parallel(_data);
+        //[Benchmark]
+        //public ulong SumParallel() => DigitsSummer.SumParallel(_data);
+
+        //[Benchmark]
+        //public ulong SumVx24Parallel() => DigitsSummer.SumVx24Parallel(_data);
+
+        //[Benchmark]
+        //public ulong SumVx251Parallel() => DigitsSummer.SumVx251Parallel(_data);
 
 
         //[Benchmark]

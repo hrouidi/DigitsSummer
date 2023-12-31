@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -81,25 +80,13 @@ namespace DigitsSummer.Benchmarks
             }
         }
 
-        public static string GenerateDataAsString(int maxDigits)
-        {
-            var sb = new StringBuilder(maxDigits);
-            for (int index = 0; index < maxDigits; ++index)
-                sb.Append(Random.Shared.Next(0, 10));
-            var ret = sb.ToString();
-
-            return ret;
-        }
+        public static string GenerateDataAsString(int maxDigits) => new(Random.Shared.GetItems<char>("0123456789", maxDigits));
 
         public static string GenerateOnesAsString(int maxDigits)
         {
-
-            var sb = new StringBuilder(maxDigits);
-            for (int index = 0; index < maxDigits; ++index)
-                sb.Append("1");
-            var ret = sb.ToString();
-
-            return ret;
+            char[] ret = new char[maxDigits];
+            ret.AsSpan().Fill('1');
+            return new string(ret);
         }
     }
 }

@@ -2,6 +2,8 @@ using System;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Linq;
+using System.Runtime;
+using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Cryptography;
 using DigitsSummer.Benchmarks;
@@ -38,20 +40,19 @@ namespace DigitsSummer.Tests
             Assert.AreEqual(expected, DigitsSummer.SumVx240(data));
             Assert.AreEqual(expected, DigitsSummer.SumVx250(data));
             Assert.AreEqual(expected, DigitsSummer.SumVx251(data));
+            Assert.AreEqual(expected, DigitsSummer.SumVx252(data));
 
         }
 
         [Test, Explicit]
         public static void Debug()
         {
-            //var input = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-            //var input = GlobalSetupHelper.GenerateDataAsString(20_000);
-            var input = GlobalSetupHelper.GenerateOnesAsString(24_000_000);
-            var tmp2 = Random.Shared.GetItems<char>("0123456789", 24_000_000);
-            var tmp3 = ArrayPool<char>.Shared.Rent(24_000_000);
-            Random.Shared.GetItems<char>("0123456789", tmp3);
+            const int length = 10_000;
+            string? input = GlobalSetupHelper.GenerateOnesAsString(length);
+            //string? tmp = GlobalSetupHelper.GenerateDataAsString(length);
+            Assert.AreEqual(length,input.Length);
             ulong expected = DigitsSummer.SumChar(input);
-            ulong actual = DigitsSummer.SumVx251(input);
+            ulong actual = DigitsSummer.SumVx252(input);
             Assert.AreEqual(expected, actual);
         }
 
@@ -89,10 +90,25 @@ namespace DigitsSummer.Tests
         [Test, Explicit]
         public static void Profile()
         {
-            bool sse = Sse42.IsSupported;
-            
+            var tmp = GC.AllocateUninitializedArray<byte>(102);
 
-            var ret = DigitsSummer.SumVx250(_input);
+            var config = GC.GetConfigurationVariables();
+
+            if (GC.TryStartNoGCRegion(1))
+            {
+                GCSettings.LatencyMode = GCLatencyMode.NoGCRegion;
+
+
+                GC.RegisterNoGCRegionCallback(1, () =>
+                {
+
+                });
+                if (GCSettings.LatencyMode == GCLatencyMode.NoGCRegion)
+                    GC.EndNoGCRegion();
+            }
+
+
+
         }
     }
 

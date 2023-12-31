@@ -14,7 +14,7 @@ namespace DigitsSummer.Benchmarks
             //Summary summary = BenchmarkRunner.Run<SumParallelBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<SumBenchmarks>();
             //Summary summary = BenchmarkRunner.Run<VectorSumBenchmarks>();
-            //Summary summary = BenchmarkRunner.Run<SumVxBenchmarks>();
+            Summary summary = BenchmarkRunner.Run<SumVxBenchmarks>();
 
             //Summary summary = BenchmarkRunner.Run<SumFromFileBenchmarks>();
 
@@ -25,7 +25,7 @@ namespace DigitsSummer.Benchmarks
 
 
 
-            Summary summary = BenchmarkRunner.Run<DebugBenchmarks>();
+            //Summary summary = BenchmarkRunner.Run<DebugBenchmarks>();
 
         }
     }
